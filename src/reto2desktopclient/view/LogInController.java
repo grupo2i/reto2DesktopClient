@@ -93,7 +93,7 @@ public class LogInController {
     private void switchToAdminMainMenuWindow() {
         try {
             LOGGER.log(Level.INFO, "Redirecting to AdminMainMenu window.");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/adminMainMenu.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/AdminMainMenu.fxml"));
             Parent root = (Parent) loader.load();
             //Getting window controller.
             AdminMainMenuController controller = (loader.getController());

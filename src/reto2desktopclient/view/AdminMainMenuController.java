@@ -40,7 +40,7 @@ public class AdminMainMenuController {
     private void handleButtonLogOut(ActionEvent event) {
         try {
             LOGGER.log(Level.INFO, "Redirecting to LogIn window.");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/logIn.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/LogIn.fxml"));
             Parent root = (Parent) loader.load();
             //Getting window controller.
             LogInController controller = (loader.getController());
@@ -61,7 +61,7 @@ public class AdminMainMenuController {
     private void handleButtonManageClients(ActionEvent event) {
         try {
             LOGGER.log(Level.INFO, "Redirecting to ClientManagement window.");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/clientManagement.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/ClientManagement.fxml"));
             Parent root = (Parent) loader.load();
             //Getting window controller.
             ClientManagementController controller = (loader.getController());
@@ -82,7 +82,7 @@ public class AdminMainMenuController {
     private void handleButtonManageClubs(ActionEvent event) {
         try {
             LOGGER.log(Level.INFO, "Redirecting to ClubManagement window.");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/clubManagement.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/ClubManagement.fxml"));
             Parent root = (Parent) loader.load();
             //Getting window controller.
             ClubManagementController controller = (loader.getController());
