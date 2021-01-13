@@ -6,16 +6,28 @@
 package reto2desktopclient.view;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+import static javafx.scene.input.KeyCode.T;
 import javafx.stage.Stage;
+import javax.ws.rs.core.GenericType;
+import reto2desktopclient.client.EventManagerFactory;
+import reto2desktopclient.client.UserManagerFactory;
+import reto2desktopclient.model.Event;
 
 /**
- *
+ *  TODO: Remove id column
+ *        Validate item not col or row in table
  * @author Martin Angulo
  */
 public class EventManagementController {
@@ -23,6 +35,22 @@ public class EventManagementController {
     
     @FXML
     private Stage stage;
+    
+    @FXML
+    private TableView tblEvents;
+    @FXML
+    private TableColumn<String, Integer> colID;
+    @FXML
+    private TableColumn<String, String> colDate;
+    @FXML
+    private TableColumn<String, Double> colPrice;
+    @FXML
+    private TableColumn<String, String> colDescription;
+    @FXML
+    private TableColumn<String, String> colMusicGenre;
+    @FXML
+    private TableColumn<String, String> colPlace;
+    private ObservableList<Event> data;
     
     /**
      * Initializes the scene and its components
@@ -35,6 +63,10 @@ public class EventManagementController {
         stage.setTitle("Event Management");
         stage.setResizable(false);
         stage.show();
+        
+        String priv = UserManagerFactory.getUserManager().getPrivilege("mamaduk1");
+        System.out.println(priv);
+        
         LOGGER.log(Level.INFO, "Successfully switched to Event Management window.");
     }
     
@@ -80,4 +112,6 @@ public class EventManagementController {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
+    
+    private void getData(){}
 }
