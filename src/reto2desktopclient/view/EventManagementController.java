@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.collections.FXCollections;
+import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,12 +17,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
-import static javafx.scene.input.KeyCode.T;
 import javafx.stage.Stage;
 import javax.ws.rs.core.GenericType;
 import reto2desktopclient.client.EventManagerFactory;
-import reto2desktopclient.client.UserManagerFactory;
 import reto2desktopclient.model.Event;
 
 /**
@@ -37,7 +34,7 @@ public class EventManagementController {
     private Stage stage;
     
     @FXML
-    private TableView tblEvents;
+    private TableView<ObservableList<StringProperty>> tblEvents = new TableView<>();
     @FXML
     private TableColumn<String, Integer> colID;
     @FXML
@@ -50,7 +47,6 @@ public class EventManagementController {
     private TableColumn<String, String> colMusicGenre;
     @FXML
     private TableColumn<String, String> colPlace;
-    private ObservableList<Event> data;
     
     /**
      * Initializes the scene and its components
@@ -64,8 +60,9 @@ public class EventManagementController {
         stage.setResizable(false);
         stage.show();
         
-        String priv = UserManagerFactory.getUserManager().getPrivilege("mamaduk1");
-        System.out.println(priv);
+        List<Event> events = EventManagerFactory.getEventManager().getAllEvents(new GenericType<List<Event>>(){});
+        for(Event e : events)
+            System.out.println(e.getName());
         
         LOGGER.log(Level.INFO, "Successfully switched to Event Management window.");
     }

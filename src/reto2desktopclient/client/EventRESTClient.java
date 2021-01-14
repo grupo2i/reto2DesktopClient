@@ -51,11 +51,10 @@ public class EventRESTClient implements EventManager {
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
     }
 
-    public <T> T getAllEvents() throws ClientErrorException {
+    public <T> T getAllEvents(GenericType<T> responseType) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path("getAllEvents");
-        GenericType<List<Event>> genericType = new GenericType<List<Event>>(){};
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get((GenericType<T>) genericType);
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
     public void remove(String id) throws ClientErrorException {

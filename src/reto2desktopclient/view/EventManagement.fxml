@@ -12,12 +12,12 @@
       <TableView layoutX="49.0" layoutY="72.0" prefHeight="286.0" prefWidth="466.0"
                  fx:id="tblEvents">
         <columns>
-          <TableColumn prefWidth="41.0" text="ID" />
-          <TableColumn prefWidth="81.0" text="Date" />
-          <TableColumn prefWidth="87.0" text="Ticket Price" />
-          <TableColumn prefWidth="91.0" text="Description" />
-          <TableColumn prefWidth="91.0" text="Music Genre" />
-          <TableColumn prefWidth="59.0" text="Place" />
+          <TableColumn prefWidth="41.0" text="ID" fx:id="colID"/>
+          <TableColumn prefWidth="81.0" text="Date" fx:id="colDate"/>
+          <TableColumn prefWidth="87.0" text="Ticket Price" fx:id="colPrice"/>
+          <TableColumn prefWidth="91.0" text="Description" fx:id="colDescription"/>
+          <TableColumn prefWidth="91.0" text="Music Genre" fx:id="colMusicGenre"/>
+          <TableColumn prefWidth="59.0" text="Place" fx:id="colPlace"/>
         </columns>
       </TableView>
       <Button layoutX="336.0" layoutY="383.0" mnemonicParsing="false" text="Remove Event"
