@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,14 +18,17 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javax.ws.rs.core.GenericType;
 import reto2desktopclient.client.EventManagerFactory;
 import reto2desktopclient.model.Event;
 
 /**
- *  TODO: Remove id column
- *        Validate item not col or row in table
+ *  TODO: Remove id column.
+ *        Remove MusicGenre column.
+ *        Add Name column.
+ *        Validate item not col or row in table.
  * @author Martin Angulo
  */
 public class EventManagementController {
@@ -34,19 +38,19 @@ public class EventManagementController {
     private Stage stage;
     
     @FXML
-    private TableView<ObservableList<StringProperty>> tblEvents = new TableView<>();
+    private TableView tblEvents;
+    private ObservableList<Event> eventData;
     @FXML
-    private TableColumn<String, Integer> colID;
+    private TableColumn colName;
     @FXML
-    private TableColumn<String, String> colDate;
+    private TableColumn colDate;
     @FXML
-    private TableColumn<String, Double> colPrice;
+    private TableColumn colPlace;
     @FXML
-    private TableColumn<String, String> colDescription;
+    private TableColumn colPrice;
     @FXML
-    private TableColumn<String, String> colMusicGenre;
-    @FXML
-    private TableColumn<String, String> colPlace;
+    private TableColumn colDescription;
+    
     
     /**
      * Initializes the scene and its components
@@ -59,10 +63,17 @@ public class EventManagementController {
         stage.setTitle("Event Management");
         stage.setResizable(false);
         stage.show();
+     
+        colName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colDate.setCellValueFactory(new PropertyValueFactory<>("date"));
+        colPlace.setCellValueFactory(new PropertyValueFactory<>("place"));
+        colPrice.setCellValueFactory(new PropertyValueFactory<>("ticketprice"));
+        colDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
         
-        List<Event> events = EventManagerFactory.getEventManager().getAllEvents(new GenericType<List<Event>>(){});
-        for(Event e : events)
-            System.out.println(e.getName());
+        //Create an obsrvable list for users table.
+        eventData = FXCollections.observableArrayList(EventManagerFactory.getEventManager().getAllEvents(new GenericType<List<Event>>(){}));
+        //Set table model.
+        tblEvents.setItems(eventData);
         
         LOGGER.log(Level.INFO, "Successfully switched to Event Management window.");
     }
