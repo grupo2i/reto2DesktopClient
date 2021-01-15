@@ -27,6 +27,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
+import javafx.util.converter.DateStringConverter;
 import javafx.util.converter.FloatStringConverter;
 import javax.ws.rs.core.GenericType;
 import reto2desktopclient.client.EventManagerFactory;
@@ -77,12 +78,13 @@ public class EventManagementController {
         colName.setOnEditCommit(table -> table.getRowValue().setName(table.getNewValue()));
         
         colDate.setCellValueFactory(new PropertyValueFactory<>("date"));
-        colDate.setCellFactory((TableColumn<Event, Date> param) -> new DateEditingCell());
+        colDate.setCellFactory(TextFieldTableCell.forTableColumn(new DateStringConverter()));
         
         colPlace.setCellValueFactory(new PropertyValueFactory<>("place"));
         colPlace.setCellFactory(TextFieldTableCell.forTableColumn());
         
         colPrice.setCellValueFactory(new PropertyValueFactory<>("ticketprice"));
+        //Pass Float to String converter
         colPrice.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
         
         colDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
@@ -140,62 +142,5 @@ public class EventManagementController {
 
     public void setStage(Stage stage) {
         this.stage = stage;
-    }
-
-    class DateEditingCell extends TableCell<Event, Date> {
-        private DatePicker datePicker;
-
-        @Override
-        public void startEdit() {
-            if (!isEmpty()) {
-                super.startEdit();
-                createDatePicker();
-                setText(null);
-                setGraphic(datePicker);
-            }
-        }
-
-        @Override
-        public void cancelEdit() {
-            super.cancelEdit();
-            setText(getDate().toString());
-            setGraphic(null);
-        }
-
-        @Override
-        public void updateItem(Date item, boolean empty) {
-            super.updateItem(item, empty);
-
-            if (empty) {
-                setText(null);
-                setGraphic(null);
-            } else {
-                if (isEditing()) {
-                    if (datePicker != null) {
-                        datePicker.setValue(getDate());
-                    }
-                    setText(null);
-                    setGraphic(datePicker);
-                } else {
-                    setText(getDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)));
-                    setGraphic(null);
-                }
-            }
-        }
-
-        private void createDatePicker() {
-            datePicker = new DatePicker(getDate());
-            datePicker.setOnAction((e) -> {
-                commitEdit(Date.from(datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-            });
-        }
-
-        private LocalDate getDate() {
-            if(getItem() != null) {
-                return getItem().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            } else {
-                return LocalDate.now();
-            }
-        }
     }
 }
