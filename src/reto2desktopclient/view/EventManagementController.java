@@ -26,19 +26,22 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
 import javafx.util.converter.DateStringConverter;
 import javafx.util.converter.FloatStringConverter;
 import javax.ws.rs.core.GenericType;
+import reto2desktopclient.client.EventManager;
 import reto2desktopclient.client.EventManagerFactory;
 import reto2desktopclient.model.Event;
 
 /**
  * TODO: Remove id column. Remove MusicGenre column. Add Name column. Validate
  * item not col or row in table.
- *
+ * https://docs.oracle.com/javafx/2/ui_controls/table-view.htm
+ * https://gist.github.com/haisi/0a82e17daf586c9bab52
  * @author Martin Angulo
  */
 public class EventManagementController {
@@ -62,6 +65,8 @@ public class EventManagementController {
     @FXML
     private TableColumn<Event, String> colDescription;
 
+    private final EventManager eventManager = EventManagerFactory.getEventManager();
+    
     /**
      * Initializes the scene and its components
      *
@@ -74,16 +79,28 @@ public class EventManagementController {
         stage.setResizable(false);
         stage.show();
 
+        //Make the table editable
+        tblEvents.setEditable(true);
+        tblEvents.getSelectionModel().cellSelectionEnabledProperty().set(true);
+        
         //Set cell editing properties
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colName.setCellFactory(TextFieldTableCell.forTableColumn());
-        colName.setOnEditCommit((CellEditEvent<Event, String> t) -> {
-            ((Event)t.getTableView().getItems().get(t.getTablePosition().getRow())).setName(t.getNewValue());
+        colName.setOnEditCommit(new EventHandler<CellEditEvent<Event, String>>() {
+            @Override
+            public void handle(CellEditEvent<Event, String> t) {
+                LOGGER.log(Level.INFO, "OnEditCommit.");
+                Event currEvent = t.getRowValue();
+                currEvent.setName(t.getNewValue());
+                eventManager.edit(currEvent);
+                tblEvents.refresh();
+            }
         });
         
         colName.setOnEditCommit(table -> table.getRowValue().setName(table.getNewValue()));
         
         colDate.setCellValueFactory(new PropertyValueFactory<>("date"));
+        //Pass Date to String converter
         colDate.setCellFactory(TextFieldTableCell.forTableColumn(new DateStringConverter()));
         
         colPlace.setCellValueFactory(new PropertyValueFactory<>("place"));
@@ -97,13 +114,9 @@ public class EventManagementController {
         colDescription.setCellFactory(TextFieldTableCell.forTableColumn());
         
         //Get data and add it to the table
-        eventData = FXCollections.observableArrayList(EventManagerFactory.getEventManager().getAllEvents(new GenericType<List<Event>>() {
-        }));
+        eventData = FXCollections.observableArrayList(eventManager.getAllEvents(new GenericType<List<Event>>(){}));
         tblEvents.setItems(eventData);
-        //Make the table editable
-        tblEvents.setEditable(true);
-        tblEvents.getSelectionModel().cellSelectionEnabledProperty().set(true);
-
+        
         LOGGER.log(Level.INFO, "Successfully switched to Event Management window.");
     }
 
@@ -148,5 +161,70 @@ public class EventManagementController {
 
     public void setStage(Stage stage) {
         this.stage = stage;
+    }
+    
+    class EditingCell extends TableCell<Event, String> {
+        private TextField textField;
+ 
+        public EditingCell() {
+        }
+ 
+        @Override
+        public void startEdit() {
+            if (!isEmpty()) {
+                super.startEdit();
+                createTextField();
+                setText(null);
+                setGraphic(textField);
+                textField.selectAll();
+            }
+        }
+ 
+        @Override
+        public void cancelEdit() {
+            super.cancelEdit();
+ 
+            setText((String) getItem());
+            setGraphic(null);
+        }
+ 
+        @Override
+        public void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+ 
+            if (empty) {
+                setText(null);
+                setGraphic(null);
+            } else {
+                if (isEditing()) {
+                    if (textField != null) {
+                        textField.setText(getString());
+                    }
+                    setText(null);
+                    setGraphic(textField);
+                } else {
+                    setText(getString());
+                    setGraphic(null);
+                }
+            }
+        }
+ 
+        private void createTextField() {
+            textField = new TextField(getString());
+            textField.setMinWidth(this.getWidth() - this.getGraphicTextGap()* 2);
+            textField.focusedProperty().addListener(new ChangeListener<Boolean>(){
+                @Override
+                public void changed(ObservableValue<? extends Boolean> arg0, 
+                    Boolean arg1, Boolean arg2) {
+                        if (!arg2) {
+                            commitEdit(textField.getText());
+                        }
+                }
+            });
+        }
+ 
+        private String getString() {
+            return getItem() == null ? "" : getItem().toString();
+        }
     }
 }
