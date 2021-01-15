@@ -5,7 +5,10 @@
  */
 package reto2desktopclient.view;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -26,6 +29,7 @@ import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.core.GenericType;
 import reto2desktopclient.client.ClubManagerFactory;
 import reto2desktopclient.exceptions.UserInputException;
 import reto2desktopclient.model.Club;
@@ -36,6 +40,8 @@ import reto2desktopclient.model.UserStatus;
  * @author Ander
  */
 public class ClubManagementController {
+
+    private static final Logger LOGGER = Logger.getLogger(LogInController.class.getName());
 
     @FXML
     private Stage stage;
@@ -59,10 +65,6 @@ public class ClubManagementController {
     private TableColumn tableStatus;
     @FXML
     private Label lblTitle;
-    @FXML
-    private Label lblId;
-    @FXML
-    private TextField txtId;
     @FXML
     private Label lblLogin;
     @FXML
@@ -110,17 +112,18 @@ public class ClubManagementController {
     @FXML
     private Label lblErrorStatus;
 
-    boolean errorLoginLenght = false;
-    boolean usernameExists = false;
-    boolean errorEmailLenght = false;
-    boolean errorEmailPattern = false;
-    boolean emailExists = false;
-    boolean errorNameLenght = false;
-    boolean errorNamePattern = false;
-    boolean errorLocationLenght = false;
-    boolean errorPhoneNumberLenght = false;
-    boolean errorPhoneNumberPattern = false;
-    boolean errorStatus = false;
+    boolean errorLoginLenght = true;
+    boolean usernameExists = true;
+    boolean errorEmailLenght = true;
+    boolean errorEmailPattern = true;
+    boolean emailExists = true;
+    boolean errorNameLenght = true;
+    boolean errorNamePattern = true;
+    boolean errorLocationLenght = true;
+    boolean errorPhoneNumberLenght = true;
+    boolean errorPhoneNumberPattern = true;
+    boolean errorStatusLenght = true;
+    boolean errorStatusPattern = true;
 
     public void initStage(Parent root) {
         Scene scene = new Scene(root);
@@ -147,11 +150,12 @@ public class ClubManagementController {
         lblErrorName.setVisible(false);
         lblErrorLocation.setVisible(false);
         lblErrorPhoneNumber.setVisible(false);
-        lblErrorStatus.setVisible(true);
+        lblErrorStatus.setVisible(false);
         btnAdd.setDisable(true);
         btnUpdate.setDisable(true);
         btnDelete.setDisable(true);
         btnSeeEvents.setDisable(true);
+        txtLogin.requestFocus();
         btnAdd.setTooltip(
                 new Tooltip("Insert data to add club"));
         btnDelete.setTooltip(
@@ -176,13 +180,15 @@ public class ClubManagementController {
             if (usLenght == 0) {
                 lblErrorLogin.setText("* Field must not be empty");
             } else if (usLenght > 255) {
-                lblErrorLogin.setText("* Must be less than 255 characters");
+                lblErrorLogin.setText("* Must be < than 255");
             }
             lblErrorLogin.setVisible(true);
+            errorLoginLenght = true;
         } else {
             errorLoginLenght = false;
             lblErrorLogin.setVisible(false);
         }
+        testLabels();
     }
 
     private void handleTextEmail(Observable obs) {
@@ -195,21 +201,24 @@ public class ClubManagementController {
             //Sets the error message when the fiel is empty.
             if (txtEmailLength == 0) {
                 lblErrorEmail.setText("* Field must not be empty");
+                errorEmailLenght = false;
             } //Sets the error message when the field is longer than 255 characters.
             else if (txtEmailLength > 255) {
                 lblErrorEmail.setText("* Must be < than 255");
+                errorEmailLenght = false;
             } //Sets the error message when the field does not match the pattern.
             else if (!matcherEmail.matches()) {
                 lblErrorEmail.setText("* Must match: a@a.aa");
+                errorEmailPattern = true;
             }
             lblErrorEmail.setVisible(true);
-            errorEmailPattern = false;
-            btnAdd.setDisable(true);
+            errorEmailPattern = true;
         } else {
             errorEmailLenght = false;
             lblErrorEmail.setVisible(false);
+            errorEmailPattern = false;
         }
-
+        testLabels();
     }
 
     private void handleTextName(Observable obs) {
@@ -217,86 +226,151 @@ public class ClubManagementController {
         Pattern patternName = Pattern.compile("^([A-Za-z]+[ ]?)+$");
         Matcher matcherName = patternName.matcher(txtName.getText());
 
-        if (txtNameLength == 0 || txtNameLength > 10 || !matcherName.matches()) {
+        if (txtNameLength == 0 || txtNameLength > 255 || !matcherName.matches()) {
             //Sets the error message when the fiel is empty.
-            if (txtNameLength == 0) lblErrorName.setText("* Field must not be empty");
-            //Sets the error message when the field is longer than 255 characters.
-            else if (txtNameLength > 10) lblErrorName.setText("* Must be less than 255 characters");
-            //Sets the error message when the field does not match the pattern.
-            else if (!matcherName.matches()) lblErrorName.setText("* Must only contain letters");
-            
-            btnAdd.setDisable(true);
+            if (txtNameLength == 0) {
+                lblErrorName.setText("* Field must not be empty");
+                errorNameLenght = true;
+            } //Sets the error message when the field is longer than 255 characters.
+            else if (txtNameLength > 255) {
+                lblErrorName.setText("* Must be < than 255");
+                errorNameLenght = true;
+            } //Sets the error message when the field does not match the pattern.
+            else if (!matcherName.matches()) {
+                lblErrorName.setText("* Must only contain letters");
+                errorNamePattern = true;
+            }
             lblErrorName.setVisible(true);
         } else {
             lblErrorName.setVisible(false);
+            errorNameLenght = false;
+            errorNamePattern = false;
         }
-
+        testLabels();
     }
 
     private void handleTextLocation(Observable obs) {
-        Integer txtLocationLength = txtName.getText().trim().length();
+        Integer txtLocationLength = txtLocation.getText().trim().length();
         if (txtLocationLength == 0 || txtLocationLength > 255) {
-            errorLocationLenght = true;
-            btnAdd.setDisable(false);
+            //Sets the error message when the fiel is empty.
+            if (txtLocationLength == 0) {
+                lblErrorLocation.setText("* Field must not be empty");
+                errorLocationLenght = true;
+            } //Sets the error message when the field is longer than 255 characters.
+            if (txtLocationLength > 255) {
+                lblErrorLocation.setText("* Must be < than 255");
+                errorLocationLenght = true;
+            }
+            lblErrorLocation.setVisible(true);
+            btnAdd.setDisable(true);
         } else {
             errorLocationLenght = false;
-            btnAdd.setDisable(true);
+            lblErrorLocation.setVisible(false);
         }
+        testLabels();
     }
 
     private void handleTextPhoneNumber(Observable obs) {
-        Integer txtPhoneNumberLenght = txtName.getText().trim().length();
-        Pattern patternPhoneNumber = Pattern.compile("/\\(?([0-9]{3})\\)?([ .-]?)([0-9]{3})\\2([0-9]{4})/");
+        Integer txtPhoneNumberLenght = txtPhoneNumber.getText().trim().length();
+        Pattern patternPhoneNumber = Pattern.compile("[0-9]+");
         Matcher matcherPhoneNumber = patternPhoneNumber.matcher(txtPhoneNumber.getText());
-        if (txtPhoneNumberLenght == 0 || txtPhoneNumberLenght > 255) {
-            errorPhoneNumberLenght = true;
-        } else if (!matcherPhoneNumber.matches()) {
-            errorPhoneNumberPattern = true;
+        if (txtPhoneNumberLenght == 0 || txtPhoneNumberLenght > 255 || txtPhoneNumber.getText().matches("[a-zA-Z]+")) {
+            //Sets the error message when the fiel is empty.
+            if (txtPhoneNumberLenght == 0) {
+                lblErrorPhoneNumber.setText("* Field must not be empty");
+                errorPhoneNumberLenght = true;
+            } //Sets the error message when the field is longer than 255 characters.
+            else if (txtPhoneNumberLenght > 255) {
+                lblErrorPhoneNumber.setText("* Must be < than 255");
+                errorPhoneNumberLenght = true;
+            } else if (txtPhoneNumber.getText().matches("[a-zA-Z]+")) {
+                lblErrorPhoneNumber.setText("* Only numbers allowed");
+                errorPhoneNumberPattern = true;
+            }
+            lblErrorPhoneNumber.setVisible(true);
         } else {
+            lblErrorPhoneNumber.setVisible(false);
             errorPhoneNumberLenght = false;
             errorPhoneNumberPattern = false;
         }
+        testLabels();
     }
 
     private void handleTextStatus(Observable obs) {
         String status = txtStatus.getText();
-        if (status.equals("Enabled") || status.equals("enabled") || status.equals("Disabled")
-                || status.equals("disabled")) {
-            errorStatus = false;
+        Integer txtStatusLenght = txtStatus.getText().trim().length();
+
+        if (txtStatusLenght == 0 || txtStatusLenght > 255) {
+            //Sets the error message when the fiel is empty.
+            if (txtStatusLenght == 0) {
+                lblErrorStatus.setText("* Field must not be empty");
+                errorStatusLenght = true;
+            } //Sets the error message when the field is longer than 255 characters.
+            if (txtStatusLenght > 255) {
+                lblErrorStatus.setText("* Must be < than 255");
+                errorStatusLenght = true;
+            }
+            lblErrorStatus.setVisible(true);
+            btnAdd.setDisable(true);
         } else {
-            errorStatus = true;
+            if (!status.equalsIgnoreCase("enabled") && !status.equalsIgnoreCase("disabled")) {
+                lblErrorStatus.setText("* Enter Enabled or Disabled");
+                lblErrorStatus.setVisible(true);
+                btnAdd.setDisable(true);
+                errorStatusPattern = true;
+            } else {
+                errorStatusLenght = false;
+                errorStatusPattern = false;
+                lblErrorStatus.setVisible(false);
+            }
         }
+        testLabels();
     }
 
     @FXML
     public void handleButtonAdd(ActionEvent event) throws UserInputException {
+        Integer encontradoUsername = 0;
+        Integer encontradoMail = 0;
+
         try {
             Club club = new Club();
-            ArrayList<Club> clubfind = new ArrayList<>();
-            clubfind = ClubManagerFactory.getClubManager().getAllClubs(ArrayList.class);
-            for (Integer x = 0; x < clubfind.size(); x++) {
+            List<Club> clubfind = ClubManagerFactory.getClubManager()
+                    .getAllClubs(new GenericType<List<Club>>() {
+                    });
+
+            for (int x = 0; x < clubfind.size(); x++) {
                 if (clubfind.get(x).getLogin().equals(txtLogin.getText())) {
                     usernameExists = true;
+                    encontradoUsername = x;
+                    break;
                 } else {
                     usernameExists = false;
                 }
             }
             if (usernameExists) {
-                throw new UserInputException("Username already exists");
+                LOGGER.log(Level.SEVERE, "Username with login: " + clubfind.get(encontradoUsername).getLogin() + " already in use");
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Username " + clubfind.get(encontradoUsername).getLogin() + " already exists", ButtonType.OK);
+                alert.showAndWait();
             } else {
                 club.setLogin(txtLogin.getText());
             }
-            ArrayList<Club> clubmail = new ArrayList<>();
-            clubmail = ClubManagerFactory.getClubManager().getAllClubs(ArrayList.class);
-            for (Integer x = 0; x < clubmail.size(); x++) {
-                if (clubmail.get(x).getEmail().equals(txtEmail.getText())) {
+            Club clubmail = new Club();
+            List<Club> clubfindmail = ClubManagerFactory.getClubManager()
+                    .getAllClubs(new GenericType<List<Club>>() {
+                    });
+            for (int x = 0; x < clubfindmail.size(); x++) {
+                if (clubfindmail.get(x).getEmail().equals(txtEmail.getText())) {
                     emailExists = true;
+                    encontradoMail = x;
+                    break;
                 } else {
                     emailExists = false;
                 }
             }
             if (emailExists) {
-                throw new UserInputException("Email already exists");
+                LOGGER.log(Level.SEVERE, "Email: " + clubfindmail.get(encontradoMail).getEmail() + " already in use");
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Email " + clubfind.get(encontradoMail).getEmail() + " already exists", ButtonType.OK);
+                alert.showAndWait();
             } else {
                 club.setEmail(txtEmail.getText());
             }
@@ -312,4 +386,13 @@ public class ClubManagementController {
         }
     }
 
+    private void testLabels() {
+
+        if (errorStatusPattern || errorStatusPattern || errorNameLenght || errorNamePattern || errorEmailPattern
+                || errorEmailLenght || errorLocationLenght || errorPhoneNumberLenght || errorPhoneNumberPattern) {
+            btnAdd.setDisable(true);
+        } else {
+            btnAdd.setDisable(false);
+        }
+    }
 }
