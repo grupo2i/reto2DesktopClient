@@ -89,7 +89,7 @@ public class LogInController {
                 case ADMIN:
                     user = UserManagerFactory.getUserManager().signIn(
                             User.class, txtUsername.getText(), encodedPassword);
-                    switchToAdminMainMenuWindow();
+                    switchToClientManagementWindow();
                     break;
                 case ARTIST:
                     Artist artist = UserManagerFactory.getUserManager().signIn(
@@ -103,30 +103,28 @@ public class LogInController {
                     break;
             }
             
-            //TODO: Fix User signIn REST method.
         } catch (ClientErrorException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK);
             alert.showAndWait();
             LOGGER.log(Level.SEVERE, ex.getMessage());
-            ex.printStackTrace();
         }
     }
     
     /**
      * Switches the scene from LogIn to AdminMainMenu.
      */
-    private void switchToAdminMainMenuWindow() {
+    private void switchToClientManagementWindow() {
         try {
-            LOGGER.log(Level.INFO, "Redirecting to AdminMainMenu window.");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/AdminMainMenu.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/ClientManagement.fxml"));
             Parent root = (Parent) loader.load();
             //Getting window controller.
-            AdminMainMenuController controller = (loader.getController());
+            ClientManagementController controller = (loader.getController());
             controller.setStage(stage);
             //Initializing stage.
             controller.initStage(root);
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "Could not switch to AdminMainMenu window: {0}", ex.getMessage());
+            LOGGER.log(Level.SEVERE, "Could not switch to ClientManagement window: {0}", ex.getMessage());
+            ex.printStackTrace();
         }
       
     }
