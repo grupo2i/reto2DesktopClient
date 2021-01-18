@@ -23,7 +23,7 @@ public class UserRESTClient implements UserManager {
     private WebTarget webTarget;
     private Client client;
     private static final String BASE_URI = ResourceBundle
-            .getBundle("properties.properties").getString("BASE_URI");
+            .getBundle("reto2desktopclient.properties.properties").getString("BASE_URI");
 
     public UserRESTClient() {
         client = javax.ws.rs.client.ClientBuilder.newClient();

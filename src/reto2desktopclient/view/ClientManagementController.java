@@ -28,22 +28,6 @@ public class ClientManagementController {
         stage.show();
     }
     
-    private void switchToClubManagementWindow() {
-        try {
-            //LOGGER.log(Level.INFO, "Redirecting to ClientManagement window.");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/ClubManagement.fxml"));
-            Parent root = (Parent) loader.load();
-            //Getting window controller.
-            ClubManagementController controller = (loader.getController());
-            controller.setStage(stage);
-            //Initializing stage.
-            controller.initStage(root);
-        } catch (IOException ex) {
-            //LOGGER.log(Level.SEVERE, "Could not switch to ClientManagement window: {0}", ex.getMessage());
-        }
-      
-    }
-    
         
     public Stage getStage() {
         return stage;
