@@ -16,7 +16,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox prefHeight="474.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="reto2desktopclient.view.ArtistManagementController">
+<VBox prefHeight="474.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="reto2desktopclient.view.ArtistManagementController">
     <children>
         <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="501.0" prefWidth="647.0" VBox.vgrow="ALWAYS">
             <children>
@@ -51,9 +51,9 @@
                 <Button fx:id="btnUpdateArtist" layoutX="322.0" layoutY="429.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="91.0" text="Update Artist" />
                 <Button fx:id="btnDeleteArtist" layoutX="432.0" layoutY="429.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="91.0" text="Delete Artist" />
                 <Button fx:id="btnAddArtist" layoutX="548.0" layoutY="429.0" mnemonicParsing="false" text="Add artist" />
-            <Label layoutX="114.0" layoutY="60.0" text="* Name error message" textFill="RED" />
-            <Label layoutX="102.0" layoutY="123.0" text="* Email error message" textFill="RED" />
-            <Label layoutX="328.0" layoutY="60.0" prefHeight="17.0" prefWidth="126.0" text="* Username error" textFill="RED" />
+            <Label fx:id="lblNameError1" layoutX="114.0" layoutY="60.0" text="* Name error message" textFill="RED" />
+            <Label fx:id="lblEmailError1" layoutX="102.0" layoutY="123.0" text="* Email error message" textFill="RED" />
+            <Label fx:id="lblUsernameError1" layoutX="328.0" layoutY="60.0" prefHeight="17.0" prefWidth="126.0" text="* Username error" textFill="RED" />
             <MenuBar layoutX="-9.0" layoutY="1.0" prefHeight="6.0" prefWidth="656.0">
               <menus>
                 <Menu mnemonicParsing="false" text="Window">
@@ -67,3 +67,4 @@
         </AnchorPane>
     </children>
 </VBox>
+
