@@ -133,6 +133,10 @@ public class EventManagementController {
     @FXML
     private void handleButtonRemoveEvent() {
         LOGGER.log(Level.INFO, "Removing event.");
+        Event currEvent = (Event)tblEvents.getFocusModel().getFocusedItem();
+        eventManager.remove(currEvent.getId().toString());
+        eventData.remove(currEvent);
+        tblEvents.refresh();
     }
 
     /**
@@ -141,6 +145,9 @@ public class EventManagementController {
     @FXML
     private void handleButtonAddEvent() {
         LOGGER.log(Level.INFO, "Adding event.");
+        Event newEvent = new Event();
+        eventData.add(newEvent);
+        tblEvents.setItems(eventData);
     }
 
     /**
