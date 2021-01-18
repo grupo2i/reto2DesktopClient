@@ -10,55 +10,42 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-            minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
+            minWidth="-Infinity" prefHeight="400.0" prefWidth="647.0"
             xmlns="http://javafx.com/javafx/8.0.171"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="reto2desktopclient.view.ClientManagementController">
-   <center>
-      <Pane fx:id="painContent" prefHeight="200.0"
-            prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <TableView fx:id="tableClients" layoutX="24.0" layoutY="41.0"
-                       prefHeight="250.0" prefWidth="550.0">
-              <columns>
-                <TableColumn fx:id="tableColId" prefWidth="75.0" text="ID" />
-                <TableColumn fx:id="tableColLogin" prefWidth="75.0" text="Login" />
-                  <TableColumn fx:id="tableColEmail" prefWidth="75.0" text="Email" />
-                  <TableColumn fx:id="tableColFullName" prefWidth="75.0" text="Full Name" />
-                  <TableColumn fx:id="tableColLastAccess" prefWidth="75.0" text="Last Access" />
-                  <TableColumn fx:id="tableColStatus" prefWidth="75.0" text="Status" />
-              </columns>
-               <contextMenu>
-                  <ContextMenu>
-                    <items>
-                      <MenuItem fx:id="menuItemNewClient"
-                                mnemonicParsing="false" text="New Client" />
-                        <MenuItem fx:id="menuItemSeeEvents"
-                                  mnemonicParsing="false" text="See Events" />
-                    </items>
-                  </ContextMenu>
-               </contextMenu>
-            </TableView>
-            <Label layoutX="24.0" layoutY="14.0" text="Client Management:">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Label>
-            <Button fx:id="btnNewClient" layoutX="500.0" layoutY="301.0"
-                    mnemonicParsing="false" text="New Client" />
-            <Button fx:id="btnSeeEvents" layoutX="416.0" layoutY="301.0"
-                    mnemonicParsing="false" text="See Events" />
-         </children>
-      </Pane>
-   </center>
-   <bottom>
-      <Pane fx:id="paneFooter" prefHeight="45.0" prefWidth="600.0" BorderPane.alignment="CENTER">
-         <children>
-            <Button fx:id="btnBack" layoutX="14.0" layoutY="10.0"
-                    mnemonicParsing="false" prefHeight="25.0" prefWidth="64.0" text="Back" />
-         </children>
-      </Pane>
-   </bottom>
+    <top>
+        <fx:include fx:id="adminMenu" source="AdminMenu.fxml"/>
+    </top>
+    <center>
+        <Pane fx:id="painContent" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <children>
+                <TableView fx:id="tableClients" layoutX="25.0" layoutY="81.0" prefHeight="250.0" prefWidth="550.0">
+                    <columns>
+                        <TableColumn fx:id="tableColLogin" prefWidth="86.0" text="Login" />
+                        <TableColumn fx:id="tableColEmail" prefWidth="150.0" text="Email" />
+                        <TableColumn fx:id="tableColFullName" prefWidth="118.0" text="Full Name" />
+                        <TableColumn fx:id="tableColLastAccess" minWidth="0.0" prefWidth="93.0" text="Last Access" />
+                        <TableColumn fx:id="tableColStatus" minWidth="0.0" prefWidth="84.0" text="Status" />
+                    </columns>
+                    <contextMenu>
+                        <ContextMenu fx:id="contectMenu">
+                            <items>
+                                <MenuItem fx:id="menuItemNewClient" mnemonicParsing="false" text="New Client" />
+                                <MenuItem fx:id="menuItemSeeEvents" mnemonicParsing="false" text="See Events" />
+                            </items>
+                        </ContextMenu>
+                    </contextMenu>
+                </TableView>
+                <Label layoutX="25.0" layoutY="54.0" text="Client Management:">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                </Label>
+                <Button fx:id="btnNewClient" layoutX="501.0" layoutY="342.0" mnemonicParsing="false" text="New Client" />
+                <Button fx:id="btnSeeEvents" layoutX="417.0" layoutY="342.0" mnemonicParsing="false" text="See Events" />
+            </children>
+        </Pane>
+    </center>
 </BorderPane>
