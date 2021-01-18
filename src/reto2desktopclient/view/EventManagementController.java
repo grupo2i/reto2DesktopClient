@@ -19,6 +19,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
+import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -121,8 +122,7 @@ public class EventManagementController {
         });
         
         //Get data and add it to the table
-        eventData = FXCollections.observableArrayList(eventManager.getAllEvents(new GenericType<List<Event>>(){}));
-        tblEvents.setItems(eventData);
+        refreshData();
         
         LOGGER.log(Level.INFO, "Successfully switched to Event Management window.");
     }
@@ -135,8 +135,7 @@ public class EventManagementController {
         LOGGER.log(Level.INFO, "Removing event.");
         Event currEvent = (Event)tblEvents.getFocusModel().getFocusedItem();
         eventManager.remove(currEvent.getId().toString());
-        eventData.remove(currEvent);
-        tblEvents.refresh();
+        refreshData();
     }
 
     /**
@@ -146,8 +145,12 @@ public class EventManagementController {
     private void handleButtonAddEvent() {
         LOGGER.log(Level.INFO, "Adding event.");
         Event newEvent = new Event();
-        eventData.add(newEvent);
-        tblEvents.setItems(eventData);
+        eventManager.create(newEvent);
+        refreshData();
+        tblEvents.getSelectionModel().clearSelection();
+        tblEvents.getSelectionModel().select(tblEvents.getItems().size() - 1, colName);
+        tblEvents.scrollTo(newEvent);
+        tblEvents.refresh();
     }
 
     /**
@@ -175,5 +178,10 @@ public class EventManagementController {
 
     public void setStage(Stage stage) {
         this.stage = stage;
+    }
+    
+    private void refreshData() {
+        eventData = FXCollections.observableArrayList(eventManager.getAllEvents(new GenericType<List<Event>>(){}));
+        tblEvents.setItems(eventData);
     }
 }
