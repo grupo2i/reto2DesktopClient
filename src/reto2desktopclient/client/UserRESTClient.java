@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package reto2desktopclient.client;
 
+import java.util.ResourceBundle;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
@@ -26,7 +22,8 @@ public class UserRESTClient implements UserManager {
 
     private WebTarget webTarget;
     private Client client;
-    private static final String BASE_URI = "http://localhost:11238/reto2Server/webresources";
+    private static final String BASE_URI = ResourceBundle
+            .getBundle("properties.properties").getString("BASE_URI");
 
     public UserRESTClient() {
         client = javax.ws.rs.client.ClientBuilder.newClient();
@@ -37,6 +34,7 @@ public class UserRESTClient implements UserManager {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("getPrivilege/{0}", new Object[]{login}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        
     }
 
     public void edit(Object requestEntity, String id) throws ClientErrorException {

@@ -10,18 +10,14 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-            minWidth="-Infinity" prefHeight="400.0" prefWidth="647.0"
-            xmlns="http://javafx.com/javafx/8.0.171"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="reto2desktopclient.view.ClientManagementController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="647.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="reto2desktopclient.view.ClientManagementController">
     <top>
-        <fx:include fx:id="adminMenu" source="AdminMenu.fxml"/>
+        <fx:include fx:id="adminMenu" source="AdminMenu.fxml" />
     </top>
     <center>
         <Pane fx:id="painContent" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <children>
-                <TableView fx:id="tableClients" layoutX="25.0" layoutY="81.0" prefHeight="250.0" prefWidth="550.0">
+                <TableView fx:id="tableClients" layoutX="24.0" layoutY="58.0" prefHeight="250.0" prefWidth="550.0">
                     <columns>
                         <TableColumn fx:id="tableColLogin" prefWidth="86.0" text="Login" />
                         <TableColumn fx:id="tableColEmail" prefWidth="150.0" text="Email" />
@@ -38,13 +34,13 @@
                         </ContextMenu>
                     </contextMenu>
                 </TableView>
-                <Label layoutX="25.0" layoutY="54.0" text="Client Management:">
+                <Label layoutX="24.0" layoutY="31.0" text="Client Management:">
                     <font>
                         <Font size="18.0" />
                     </font>
                 </Label>
-                <Button fx:id="btnNewClient" layoutX="501.0" layoutY="342.0" mnemonicParsing="false" text="New Client" />
-                <Button fx:id="btnSeeEvents" layoutX="417.0" layoutY="342.0" mnemonicParsing="false" text="See Events" />
+                <Button fx:id="btnNewClient" layoutX="500.0" layoutY="319.0" mnemonicParsing="false" text="New Client" />
+                <Button fx:id="btnSeeEvents" layoutX="416.0" layoutY="319.0" mnemonicParsing="false" text="See Events" />
             </children>
         </Pane>
     </center>
