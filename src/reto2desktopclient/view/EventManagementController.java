@@ -7,6 +7,8 @@ package reto2desktopclient.view;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -108,7 +110,10 @@ public class EventManagementController {
             }
         });
         colDate.setOnEditCommit((CellEditEvent<Event, Date> t) -> {
-            if(validateLength(t.getNewValue().toString())) {
+            if(t.getNewValue() == null) {
+                lblError.setText("* Field must not be empty");
+                lblError.setVisible(true);
+            } else if(validateDate(t.getNewValue().toString())) {
                 Event currEvent = t.getRowValue();
                 currEvent.setDate(t.getNewValue());
                 eventManager.edit(currEvent);
@@ -124,12 +129,17 @@ public class EventManagementController {
             }
         });
         colPrice.setOnEditCommit((CellEditEvent<Event, Float> t) -> {
-            if(validateLength(t.getNewValue().toString())) {
+            if(validateLength(t.getNewValue().toString()) && validatePrice(t.getNewValue())) {
                 Event currEvent = t.getRowValue();
                 currEvent.setTicketprice(t.getNewValue());
                 eventManager.edit(currEvent);
                 tblEvents.refresh();
-           }
+            } else {
+                Event currEvent = t.getRowValue();
+                currEvent.setTicketprice(null);
+                eventManager.edit(currEvent);
+                tblEvents.refresh();
+            }
         });
         colDescription.setOnEditCommit((CellEditEvent<Event, String> t) -> {
             if(validateLength(t.getNewValue())) {
@@ -219,10 +229,30 @@ public class EventManagementController {
     }
     
     private Boolean validateDate(String date) {
-        //Pattern used to validate the email format.
-        Pattern patternDate = Pattern.compile("");
-        //Used to check if the email matches the pattern.
-        Matcher matcherDate = patternDate.matcher(date);
-        return matcherDate.matches();
+        if(!date.matches("\\d{2}/[01]\\d/[0-3]\\d")) {
+            lblError.setText("* Date must have format: mm/dd/yy");
+            lblError.setVisible(true);
+            return false;
+        }
+
+        SimpleDateFormat df = new SimpleDateFormat("MM/dd/yy");
+        df.setLenient(false);
+        try {
+            df.parse(date);
+            return true;
+        } catch (ParseException ex) {
+            lblError.setText("* Date must be possible");
+            lblError.setVisible(true);
+            return false;
+        }
+    }
+    
+    private Boolean validatePrice(Float price) {
+        if(price < 0) {
+            lblError.setText("* Price cannot be negative");
+            lblError.setVisible(true);
+            return false;
+        }
+        return true;
     }
 }
