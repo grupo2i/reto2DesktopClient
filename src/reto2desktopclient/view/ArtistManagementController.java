@@ -13,7 +13,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
@@ -42,34 +44,42 @@ public class ArtistManagementController {
     private TextField txtFullNameArtist;
     @FXML
     private ChoiceBox choiceBox;
+    @FXML
+    private Label lblNameError1;
+    @FXML
+    private Label lblEmailError1;
+    @FXML
+    private Label lblUsernameError1;
 
     boolean errorEmailLenght = false;
     boolean errorEmailPattern = false;
     boolean errorTxtUserNameArtist = false;
     boolean errorTxtFullNameArtist = false;
 
-    void initStage(Parent root
+    public void initStage(Parent root
     ) {
         //Initialize the stage
         Scene scene = new Scene(root);
-        Logger.getLogger(LogInController.class.getName()).log(Level.INFO, "Initializing stage...");
         stage.setScene(scene);
         stage.setTitle("Artist Management");
-        //Initialite the attributes
-        stage.setResizable(false);
-        btnAddArtist.setDisable(true);
-        btnDeleteArtist.setDisable(true);
-        btnUpdateArtist.setDisable(true);
-        txtFullNameArtist.requestFocus();
-        //The txt and the functions connect each other
+        Logger.getLogger(LogInController.class.getName()).log(Level.INFO, "Initializing stage...");
+
         txtEmailArtist.textProperty().addListener(this::handletxtEmailArtist);
         txtFullNameArtist.textProperty().addListener(this::handleTextFullNameArtist);
         txtUserNameArtist.textProperty().addListener(this::handletxtUserNameArtist);
+
+        btnAddArtist.setDisable(true);
+        btnDeleteArtist.setDisable(true);
+        btnUpdateArtist.setDisable(true);
+
+        lblNameError1.setVisible(false);
+        lblEmailError1.setVisible(false);
+        lblUsernameError1.setVisible(false);
         //Calls the ChoiceBox function
         initializeCheckBox();
-        btnAddArtist.setTooltip(new Tooltip("Click to send credentials."));
         //Shows the stage
         stage.show();
+        LOGGER.log(Level.INFO, "Successfully switched to Artist window.");
     }
 
     /**
@@ -131,7 +141,9 @@ public class ArtistManagementController {
     @FXML
     public void initializeCheckBox() {
         choiceBox.setItems(FXCollections.observableArrayList(
-                "POP", "ROCK", "REGGAE", "EDM", "TRAP", "RAP", "INDIE", "REGGAETON", "OTHER"));
+                "POP", "ROCK", "REGGAE", "EDM", "TRAP", "RAP", "INDIE", "REGGAETON", new Separator(), "OTHER"));
+        choiceBox.setTooltip(new Tooltip("Select the music genre"));
+        choiceBox.setValue("POP");
     }
 
     /**
@@ -163,7 +175,7 @@ public class ArtistManagementController {
     public Stage getStage() {
         return stage;
     }
-  
+
     private void testInputErrors() {
         if (errorTxtFullNameArtist || errorTxtUserNameArtist || errorEmailLenght) {
             btnAddArtist.setDisable(false);
