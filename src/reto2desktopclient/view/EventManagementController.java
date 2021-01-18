@@ -6,10 +6,13 @@
 package reto2desktopclient.view;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -17,9 +20,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
-import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -59,6 +62,9 @@ public class EventManagementController {
 
     private final EventManager eventManager = EventManagerFactory.getEventManager();
     
+    @FXML
+    private Label lblError;
+    
     /**
      * Initializes the scene and its components
      *
@@ -71,6 +77,9 @@ public class EventManagementController {
         stage.setResizable(false);
         stage.show();
 
+        //Hide label
+        lblError.setVisible(false);
+        
         //Make the table editable
         tblEvents.setEditable(true);
         tblEvents.getSelectionModel().cellSelectionEnabledProperty().set(true);
@@ -84,41 +93,51 @@ public class EventManagementController {
         
         colName.setCellFactory(TextFieldTableCell.forTableColumn());
         //Pass Date to String converter
-        colDate.setCellFactory(TextFieldTableCell.forTableColumn(new DateStringConverter()));
+        colDate.setCellFactory(TextFieldTableCell.forTableColumn(new DateStringConverter(DateFormat.SHORT)));
         colPlace.setCellFactory(TextFieldTableCell.forTableColumn());
         //Pass Float to String converter
         colPrice.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
         colDescription.setCellFactory(TextFieldTableCell.forTableColumn());
         
         colName.setOnEditCommit((CellEditEvent<Event, String> t) -> {
-            Event currEvent = t.getRowValue();
-            currEvent.setName(t.getNewValue());
-            eventManager.edit(currEvent);
-            tblEvents.refresh();
+            if(validateLength(t.getNewValue())) {
+                Event currEvent = t.getRowValue();
+                currEvent.setName(t.getNewValue());
+                eventManager.edit(currEvent);
+                tblEvents.refresh();
+            }
         });
         colDate.setOnEditCommit((CellEditEvent<Event, Date> t) -> {
-            Event currEvent = t.getRowValue();
-            currEvent.setDate(t.getNewValue());
-            eventManager.edit(currEvent);
-            tblEvents.refresh();
+            if(validateLength(t.getNewValue().toString())) {
+                Event currEvent = t.getRowValue();
+                currEvent.setDate(t.getNewValue());
+                eventManager.edit(currEvent);
+                tblEvents.refresh();
+            }
         });
         colPlace.setOnEditCommit((CellEditEvent<Event, String> t) -> {
-            Event currEvent = t.getRowValue();
-            currEvent.setPlace(t.getNewValue());
-            eventManager.edit(currEvent);
-            tblEvents.refresh();
+            if(validateLength(t.getNewValue())) {
+                Event currEvent = t.getRowValue();
+                currEvent.setPlace(t.getNewValue());
+                eventManager.edit(currEvent);
+                tblEvents.refresh();
+            }
         });
         colPrice.setOnEditCommit((CellEditEvent<Event, Float> t) -> {
-            Event currEvent = t.getRowValue();
-            currEvent.setTicketprice(t.getNewValue());
-            eventManager.edit(currEvent);
-            tblEvents.refresh();
+            if(validateLength(t.getNewValue().toString())) {
+                Event currEvent = t.getRowValue();
+                currEvent.setTicketprice(t.getNewValue());
+                eventManager.edit(currEvent);
+                tblEvents.refresh();
+           }
         });
         colDescription.setOnEditCommit((CellEditEvent<Event, String> t) -> {
-            Event currEvent = t.getRowValue();
-            currEvent.setDescription(t.getNewValue());
-            eventManager.edit(currEvent);
-            tblEvents.refresh();
+            if(validateLength(t.getNewValue())) {
+                Event currEvent = t.getRowValue();
+                currEvent.setDescription(t.getNewValue());
+                eventManager.edit(currEvent);
+                tblEvents.refresh();
+            }
         });
         
         //Get data and add it to the table
@@ -183,5 +202,27 @@ public class EventManagementController {
     private void refreshData() {
         eventData = FXCollections.observableArrayList(eventManager.getAllEvents(new GenericType<List<Event>>(){}));
         tblEvents.setItems(eventData);
+    }
+    
+    private Boolean validateLength(String s) {
+        if (s.length() == 0) {
+            lblError.setText("* Field must not be empty");
+            lblError.setVisible(true);
+            return false;
+        } else if (s.length() > 255){
+            lblError.setText("* Must be less than 255 characters");
+            lblError.setVisible(true);
+            return false;
+        }
+        lblError.setVisible(false);
+        return true;
+    }
+    
+    private Boolean validateDate(String date) {
+        //Pattern used to validate the email format.
+        Pattern patternDate = Pattern.compile("");
+        //Used to check if the email matches the pattern.
+        Matcher matcherDate = patternDate.matcher(date);
+        return matcherDate.matches();
     }
 }
