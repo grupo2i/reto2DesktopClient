@@ -23,6 +23,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
@@ -95,7 +96,7 @@ public class EventManagementController {
         
         colName.setCellFactory(TextFieldTableCell.forTableColumn());
         //Pass Date to String converter
-        colDate.setCellFactory(TextFieldTableCell.forTableColumn(new DateStringConverter(DateFormat.SHORT)));
+        colDate.setCellFactory(TextFieldTableCell.forTableColumn(new MyDateStringConverter("MM/dd/yy")));       
         colPlace.setCellFactory(TextFieldTableCell.forTableColumn());
         //Pass Float to String converter
         colPrice.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
@@ -110,15 +111,10 @@ public class EventManagementController {
             }
         });
         colDate.setOnEditCommit((CellEditEvent<Event, Date> t) -> {
-            if(t.getNewValue() == null) {
-                lblError.setText("* Field must not be empty");
-                lblError.setVisible(true);
-            } else if(validateDate(t.getNewValue().toString())) {
-                Event currEvent = t.getRowValue();
-                currEvent.setDate(t.getNewValue());
-                eventManager.edit(currEvent);
-                tblEvents.refresh();
-            }
+            Event currEvent = t.getRowValue();
+            currEvent.setDate(t.getNewValue());
+            eventManager.edit(currEvent);
+            tblEvents.refresh();
         });
         colPlace.setOnEditCommit((CellEditEvent<Event, String> t) -> {
             if(validateLength(t.getNewValue())) {
@@ -229,12 +225,11 @@ public class EventManagementController {
     }
     
     private Boolean validateDate(String date) {
-        if(!date.matches("\\d{2}/[01]\\d/[0-3]\\d")) {
+        if(!date.matches("\\d{2}/\\d{2}/\\d{2}")) {
             lblError.setText("* Date must have format: mm/dd/yy");
             lblError.setVisible(true);
             return false;
         }
-
         SimpleDateFormat df = new SimpleDateFormat("MM/dd/yy");
         df.setLenient(false);
         try {
@@ -254,5 +249,31 @@ public class EventManagementController {
             return false;
         }
         return true;
+    }
+    
+    public class MyDateStringConverter extends DateStringConverter {
+
+	public MyDateStringConverter(final String pattern) {
+		super(pattern);
+	}
+
+	@Override
+	public Date fromString(String newDate) {
+		// Catches the RuntimeException thrown by DateStringConverter.fromString()
+		try {
+                    Date date = super.fromString(newDate);
+                    lblError.setVisible(false);
+                    return date;
+		} catch (RuntimeException ex) {
+                    if(newDate.isEmpty()) {
+                        lblError.setText("* Field must not be empty");
+                        lblError.setVisible(true);
+                    }else {
+                        lblError.setText("* Date must have format: mm/dd/yy");
+                        lblError.setVisible(true);
+                    }
+                    return null;
+		}
+	}
     }
 }
