@@ -16,7 +16,7 @@ public class Reto2DesktopClient extends Application {
     
     @Override
     public void start(Stage primaryStage) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/ClubManagement.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/LogIn.fxml"));
         Parent root = (Parent) loader.load();
         //LogInController controller = (loader.getController());
         ClubManagementController controller = (loader.getController());

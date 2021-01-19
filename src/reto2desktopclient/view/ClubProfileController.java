@@ -34,6 +34,7 @@ import reto2desktopclient.model.UserPrivilege;
 import reto2desktopclient.model.UserStatus;
 import reto2desktopclient.security.PublicCrypt;
 
+
 /**
  *
  * @author Ander
@@ -331,5 +332,6 @@ public class ClubProfileController {
     public void setStage(Stage primaryStage) {
         stage = primaryStage;
     }
+
 
 }

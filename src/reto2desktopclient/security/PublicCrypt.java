@@ -20,9 +20,10 @@ public class PublicCrypt {
      * @param mensaje El mensaje a cifrar
      * @return El mensaje cifrado
      */
-    public byte[] encode(String mensaje) {
-        byte[] encodedMessage = null;
+    public static String encode(String mensaje) {
+        String encodedMessageStr = null;
         try {
+            byte[] encodedMessage = null;
             // Clave publica
             byte fileKey[] = fileReader(".\\src\\reto2desktopclient\\security\\Public.key");
             
@@ -33,11 +34,13 @@ public class PublicCrypt {
             Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);
             encodedMessage = cipher.doFinal(mensaje.getBytes());
+            //Encoding encoded message to hexadecimal.
+            encodedMessageStr = encodeHexadecimal(encodedMessage);
         } catch (Exception e) {
             e.printStackTrace();
         }
         
-        return encodedMessage;
+        return encodedMessageStr;
     }
     
     /**
@@ -46,7 +49,7 @@ public class PublicCrypt {
      * @param path Path del fichero
      * @return El texto del fichero
      */
-    private byte[] fileReader(String path) {
+    private static byte[] fileReader(String path) {
         byte ret[] = null;
         File file = new File(path);
         try {
@@ -56,4 +59,20 @@ public class PublicCrypt {
         }
         return ret;
     }
+    
+    static String encodeHexadecimal(byte[] message) {
+        String hexadecimalString = "";
+        for (int i = 0; i < message.length; i++) {
+            String h = Integer.toHexString(message[i] & 0xFF);
+            if (h.length() == 1)
+                    hexadecimalString += "0";
+            hexadecimalString += h;
+        }
+        return hexadecimalString.toUpperCase();
+    }
+    
+    public static void main(String[] args) {
+        System.out.println(encode("1234"));
+    }
+    
 }

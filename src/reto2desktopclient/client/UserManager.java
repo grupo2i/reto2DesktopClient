@@ -13,6 +13,7 @@ import javax.ws.rs.ClientErrorException;
  */
 public interface UserManager {
     
+    public <T> T getPrivilege(Class<T> responseType, String login) throws ClientErrorException;
     public void edit(Object requestEntity, String id) throws ClientErrorException;
     public <T> T find(Class<T> responseType, String id) throws ClientErrorException;
     public <T> T signIn(Class<T> responseType, String login, String password) throws ClientErrorException;
