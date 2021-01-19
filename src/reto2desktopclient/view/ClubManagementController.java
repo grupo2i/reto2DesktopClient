@@ -33,6 +33,7 @@ import javax.ws.rs.core.GenericType;
 import reto2desktopclient.client.ClubManagerFactory;
 import reto2desktopclient.exceptions.UserInputException;
 import reto2desktopclient.model.Club;
+import reto2desktopclient.model.UserPrivilege;
 import reto2desktopclient.model.UserStatus;
 
 /**
@@ -41,7 +42,7 @@ import reto2desktopclient.model.UserStatus;
  */
 public class ClubManagementController {
 
-    private static final Logger LOGGER = Logger.getLogger(LogInController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ClubManagementController.class.getName());
 
     @FXML
     private Stage stage;
@@ -374,11 +375,16 @@ public class ClubManagementController {
             } else {
                 club.setEmail(txtEmail.getText());
             }
+            String password="defaultPassword";
+            club.setPassword(password);
+            club.setUserPrivilege(UserPrivilege.CLUB);
+            club.setBiography("HOLA HOLA");
             club.setFullName(txtName.getText());
             club.setLocation(txtLocation.getText());
             club.setPhoneNum(txtPhoneNumber.getText());
-            club.setUserStatus(UserStatus.valueOf(txtStatus.getText()));
+            club.setUserStatus(UserStatus.valueOf(txtStatus.getText().toUpperCase()));
             ClubManagerFactory.getClubManager().create(club);
+            LOGGER.log(Level.INFO, "Club was added succesfuly");
         } catch (ClientErrorException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK);
             alert.showAndWait();
