@@ -2,59 +2,64 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ContextMenu?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="441.0" prefWidth="692.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<Pane fx:id="adsdf" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" 
+      minWidth="-Infinity" prefHeight="466.0" prefWidth="692.0"
+      xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="reto2desktopclient.view.ClubManagementController">
    <children>
-      <TableView id="clubTable" layoutX="34.0" layoutY="50.0" prefHeight="223.0" prefWidth="637.0">
+      <TableView fx:id="clubTable" layoutX="28.0" layoutY="75.0" prefHeight="223.0" prefWidth="637.0">
         <columns>
-          <TableColumn id="tableId" prefWidth="75.0" text="ID" />
-          <TableColumn id="tableLogin" prefWidth="75.0" text="Login" />
-            <TableColumn id="tableEmail" prefWidth="75.0" text="Email" />
-            <TableColumn id="tableName" prefWidth="75.0" text="Full Name" />
-            <TableColumn id="tableLastAccess" prefWidth="75.0" text="Last Access" />
-            <TableColumn id="tableLocation" prefWidth="75.0" text="Location" />
-            <TableColumn id="tablePhoneNumber" prefWidth="96.0" text="Phone number" />
-            <TableColumn id="tableStatus" minWidth="0.0" prefWidth="90.0" text="Status" />
+          <TableColumn fx:id="tableLogin" prefWidth="75.0" text="Login" />
+            <TableColumn fx:id="tableEmail" prefWidth="75.0" text="Email" />
+            <TableColumn fx:id="tableName" prefWidth="75.0" text="Full Name" />
+            <TableColumn fx:id="tableLastAccess" prefWidth="75.0" text="Last Access" />
+            <TableColumn fx:id="tableLocation" prefWidth="112.0" text="Location" />
+            <TableColumn fx:id="tablePhoneNumber" prefWidth="107.0" text="Phone number" />
+            <TableColumn fx:id="tableStatus" minWidth="0.0" prefWidth="117.0" text="Status" />
         </columns>
          <contextMenu>
-            <ContextMenu id="clubContextMenu">
+            <ContextMenu fx:id="clubContextMenu">
               <items>
-                  <MenuItem id="menuItemSeeEvents" mnemonicParsing="false" text="See events" />
-                  <MenuItem id="menuItemDisableClub" mnemonicParsing="false" text="Disable Club" />
+                  <MenuItem fx:id="menuItemSeeEvents" mnemonicParsing="false" text="See events" />
+                  <MenuItem fx:id="menuItemDisableClub" mnemonicParsing="false" text="Disable Club" />
               </items>
             </ContextMenu>
          </contextMenu>
       </TableView>
-      <Text id="lblTitle" layoutX="34.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Clubs:">
+      <TextField fx:id="txtLogin" layoutX="26.0" layoutY="353.0" />
+      <Label fx:id="lblLogin" layoutX="26.0" layoutY="338.0" text="Login:" />
+      <TextField fx:id="txtEmail" layoutX="183.0" layoutY="353.0" />
+      <Label fx:id="lblEmail" layoutX="185.0" layoutY="338.0" text="Email:" />
+      <Label fx:id="lblName" layoutX="345.0" layoutY="338.0" text="Full Name:" />
+      <TextField fx:id="txtName" layoutX="345.0" layoutY="353.0" prefHeight="25.0" prefWidth="161.0" />
+      <TextField fx:id="txtLocation" layoutX="27.0" layoutY="420.0" />
+      <Label fx:id="lblLocation" layoutX="28.0" layoutY="403.0" text="Location:" />
+      <Label fx:id="lblPhoneNumber" layoutX="184.0" layoutY="403.0" text="Phone Number:" />
+      <TextField fx:id="txtPhoneNumber" layoutX="184.0" layoutY="421.0" />
+      <Button fx:id="btnAdd" layoutX="595.0" layoutY="420.0" mnemonicParsing="false" onAction="#handleButtonAdd" prefHeight="25.0" prefWidth="72.0" text="Add" />
+      <Button fx:id="btnDelete" layoutX="518.0" layoutY="420.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="72.0" text="Delete" />
+      <Label fx:id="lblStatus" layoutX="346.0" layoutY="403.0" text="Status:" />
+      <TextField fx:id="txtStatus" layoutX="346.0" layoutY="421.0" prefHeight="25.0" prefWidth="161.0" />
+      <Button fx:id="btnUpdate" layoutX="516.0" layoutY="353.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="72.0" text="Update" />
+      <Button fx:id="btnSeeEvents" layoutX="594.0" layoutY="353.0" mnemonicParsing="false" text="See Events" />
+      <Label layoutX="28.0" layoutY="39.0" text="Clubs:" textFill="#09ab34">
          <font>
-            <Font size="23.0" />
+            <Font name="System Bold" size="23.0" />
          </font>
-      </Text>
-      <Text id="lblID" layoutX="34.0" layoutY="301.0" strokeType="OUTSIDE" strokeWidth="0.0" text="ID:" />
-      <TextField id="txtId" layoutX="34.0" layoutY="305.0" />
-      <TextField id="txtLogin" layoutX="191.0" layoutY="305.0" />
-      <Text id="lblLogin" layoutX="194.0" layoutY="301.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Login:" />
-      <TextField id="txtEmail" layoutX="351.0" layoutY="305.0" />
-      <Text id="lblEmail" layoutX="351.0" layoutY="301.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Email:" />
-      <Text id="lblName" layoutX="511.0" layoutY="300.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Full Name:" />
-      <TextField id="txtName" layoutX="511.0" layoutY="305.0" prefHeight="25.0" prefWidth="161.0" />
-      <TextField id="txtLocation" layoutX="34.0" layoutY="347.0" />
-      <Text id="lblLocation" layoutX="34.0" layoutY="343.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Location:" />
-      <Text id="lblPhoneNumber" layoutX="198.0" layoutY="343.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Phone Number:" />
-      <TextField id="txtPhoneNumber" layoutX="191.0" layoutY="347.0" />
-      <Button id="btnAdd" layoutX="511.0" layoutY="402.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="40.0" text="Add" />
-      <Button id="btnDelete" layoutX="564.0" layoutY="402.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="56.0" text="Delete" />
-      <Button id="btnBack" layoutX="15.0" layoutY="405.0" mnemonicParsing="false" text="Back" />
-      <Text id="lblStatus" layoutX="351.0" layoutY="343.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Status:" />
-      <TextField id="txtStatus" layoutX="351.0" layoutY="347.0" />
-      <Button id="btnUpdate" layoutX="630.0" layoutY="402.0" mnemonicParsing="false" text="Update" />
-      <Button id="btnSeeEvents" layoutX="425.0" layoutY="402.0" mnemonicParsing="false" text="See Events" />
+      </Label>
+      <Label fx:id="lblErrorLogin" layoutX="27.0" layoutY="321.0" prefHeight="17.0" prefWidth="149.0" text="errorLogin" textFill="RED" />
+      <Label fx:id="lblErrorEmail" layoutX="184.0" layoutY="321.0" prefHeight="17.0" prefWidth="149.0" text="errorEmail" textFill="RED" />
+      <Label fx:id="lblErrorName" layoutX="345.0" layoutY="321.0" prefHeight="17.0" prefWidth="149.0" text="errorName" textFill="RED" />
+      <Label fx:id="lblErrorLocation" layoutX="27.0" layoutY="386.0" prefHeight="17.0" prefWidth="149.0" text="errorLocation" textFill="RED" />
+      <Label fx:id="lblErrorPhoneNumber" layoutX="184.0" layoutY="386.0" prefHeight="17.0" prefWidth="149.0" text="errorPhoneNumber" textFill="RED" />
+      <Label fx:id="lblErrorStatus" layoutX="345.0" layoutY="386.0" prefHeight="17.0" prefWidth="149.0" text="errorStatus" textFill="RED" />
    </children>
 </Pane>

@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.stage.Stage;
+import reto2desktopclient.view.ClubManagementController;
 import reto2desktopclient.view.LogInController;
 
 /**
@@ -17,7 +18,8 @@ public class Reto2DesktopClient extends Application {
     public void start(Stage primaryStage) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/LogIn.fxml"));
         Parent root = (Parent) loader.load();
-        LogInController controller = (loader.getController());
+        //LogInController controller = (loader.getController());
+        ClubManagementController controller = (loader.getController());
         primaryStage.setResizable(Boolean.FALSE);
         controller.setStage(primaryStage);
         controller.initStage(root);
