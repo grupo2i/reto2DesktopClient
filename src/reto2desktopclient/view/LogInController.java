@@ -122,10 +122,10 @@ public class LogInController {
     private void switchToClientManagementWindow() throws UnexpectedErrorException {
         try {
             LOGGER.log(Level.INFO, "Redirecting to ClientManagement window.");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/ClientManagement.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/EventManagement.fxml"));
             Parent root = (Parent) loader.load();
             //Getting window controller.
-            ClientManagementController controller = (loader.getController());
+            EventManagementController controller = (loader.getController());
             controller.setStage(stage);
             //Initializing stage.
             controller.initStage(root);
@@ -144,7 +144,7 @@ public class LogInController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/ArtistManagement.fxml"));
             Parent root = (Parent) loader.load();
             //Getting window controller.
-            ArtistProfileController controller = (loader.getController());
+            ArtistManagementController controller = (loader.getController());
             controller.setStage(stage);
             //Initializing stage.
             controller.initStage(root);

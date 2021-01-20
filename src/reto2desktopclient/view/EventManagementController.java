@@ -42,6 +42,9 @@ public class EventManagementController {
     private Stage stage;
 
     @FXML
+    private AdminMenuController adminMenuController;
+    
+    @FXML
     private TableView tblEvents;
     private ObservableList<Event> eventData;
     @FXML
@@ -73,7 +76,8 @@ public class EventManagementController {
         stage.setTitle("Event Management");
         stage.setResizable(false);
         stage.show();
-
+        adminMenuController.setStage(stage);
+        
         //Hide label
         lblError.setVisible(false);
         
@@ -259,11 +263,11 @@ public class EventManagementController {
 	}
     }
     
-    private String getUserLogin() {
+    public String getUserLogin() {
         return userLogin;
     }
     
-    private void setUserLogin(String login) {
+    public void setUserLogin(String login) {
         userLogin = login;
     }
 }

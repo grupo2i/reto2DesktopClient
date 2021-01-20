@@ -9,7 +9,8 @@
 <?import javafx.scene.text.Text?>
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="430.0" prefWidth="564.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="reto2desktopclient.view.EventManagementController">
-   <children>
+    <children>
+      <fx:include fx:id="adminMenu" source="AdminMenu.fxml"/>
       <TableView fx:id="tblEvents" layoutX="49.0" layoutY="72.0" prefHeight="285.0" prefWidth="464.0">
         <columns>
           <TableColumn fx:id="colName" prefWidth="80.0" text="Event Name" />
@@ -26,7 +27,6 @@
             <Font size="25.0" />
          </font>
       </Text>
-      <Button fx:id="btnBack" layoutX="49.0" layoutY="383.0" mnemonicParsing="false" onAction="#handleButtonBack" prefHeight="25.0" prefWidth="60.0" text="Back" />
       <Label fx:id="lblError" layoutX="119.0" layoutY="387.0" text="*Error Label" textFill="RED" visible="false" />
    </children>
 </Pane>
