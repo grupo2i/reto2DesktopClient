@@ -91,7 +91,7 @@ public class EventManagementController {
         colDate.setCellFactory(TextFieldTableCell.forTableColumn(new MyDateStringConverter("MM/dd/yy")));       
         colPlace.setCellFactory(TextFieldTableCell.forTableColumn());
         //Pass Float to String converter
-        colPrice.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
+        colPrice.setCellFactory(TextFieldTableCell.forTableColumn(new MyFloatStringConverter()));
         colDescription.setCellFactory(TextFieldTableCell.forTableColumn());
         
         colName.setOnEditCommit((CellEditEvent<Event, String> t) -> {
@@ -243,21 +243,35 @@ public class EventManagementController {
 
 	@Override
 	public Date fromString(String newDate) {
-		// Catches the RuntimeException thrown by DateStringConverter.fromString()
-		try {
-                    Date date = super.fromString(newDate);
-                    lblError.setVisible(false);
-                    return date;
-		} catch (RuntimeException ex) {
-                    if(newDate == null) {
-                        lblError.setText("* Field must not be empty.");
-                        lblError.setVisible(true);
-                    }else {
-                        lblError.setText("* Date must have format: mm/dd/yy\nand be possible.");
-                        lblError.setVisible(true);
-                    }
-                    return null;
-		}
+            // Catches the RuntimeException thrown by DateStringConverter.fromString()
+            try {
+                Date date = super.fromString(newDate);
+                lblError.setVisible(false);
+                return date;
+            } catch (RuntimeException ex) {
+                if(newDate == null) {
+                    lblError.setText("* Field must not be empty.");
+                    lblError.setVisible(true);
+                }else {
+                    lblError.setText("* Date must have format: mm/dd/yy\nand be possible.");
+                    lblError.setVisible(true);
+                }
+                return null;
+            }
+	}
+    }
+    
+    public class MyFloatStringConverter extends FloatStringConverter {
+
+        @Override
+	public Float fromString(String newPrice) {
+            newPrice = newPrice.replace("€", "");
+            return super.fromString(newPrice);
+        }
+        
+	@Override
+	public String toString(Float price) {
+            return super.toString(price) + "€";
 	}
     }
 }
