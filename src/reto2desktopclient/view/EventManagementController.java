@@ -178,25 +178,6 @@ public class EventManagementController {
         tblEvents.refresh();
     }
 
-    /**
-     * Switches the scene from Event Management to AdminMainMenu.
-     */
-    @FXML
-    private void handleButtonBack() {
-        try {
-            LOGGER.log(Level.INFO, "Redirecting to AdminMainMenu window.");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/AdminMainMenu.fxml"));
-            Parent root = (Parent) loader.load();
-            //Getting window controller.
-            AdminMainMenuController controller = (loader.getController());
-            controller.setStage(stage);
-            //Initializing stage.
-            controller.initStage(root);
-        } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "Could not switch to AdminMainMenu window: {0}", ex.getMessage());
-        }
-    }
-
     public Stage getStage() {
         return stage;
     }

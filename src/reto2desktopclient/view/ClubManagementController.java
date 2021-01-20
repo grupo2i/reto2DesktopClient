@@ -35,6 +35,7 @@ import javafx.stage.WindowEvent;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
 import reto2desktopclient.client.ClubManagerFactory;
+import reto2desktopclient.exceptions.UnexpectedErrorException;
 import reto2desktopclient.exceptions.UserInputException;
 import reto2desktopclient.model.Club;
 import reto2desktopclient.model.UserPrivilege;
@@ -395,7 +396,7 @@ public class ClubManagementController {
             ClubManagerFactory.getClubManager().create(club);
             LOGGER.log(Level.INFO, "Club was added succesfuly");
             resetFieldsAndLabels();
-        } catch (ClientErrorException ex) {
+        } catch (ClientErrorException | UnexpectedErrorException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK);
             alert.showAndWait();
             Logger.getLogger(LogInController.class.getName()).log(Level.SEVERE, ex.getMessage());
