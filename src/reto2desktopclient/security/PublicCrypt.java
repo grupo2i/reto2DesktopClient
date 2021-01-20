@@ -7,6 +7,7 @@ import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import javax.crypto.Cipher;
+import reto2desktopclient.exceptions.UnexpectedErrorException;
 
 /**
  *
@@ -20,7 +21,7 @@ public class PublicCrypt {
      * @param mensaje El mensaje a cifrar
      * @return El mensaje cifrado
      */
-    public static String encode(String mensaje) {
+    public static String encode(String mensaje) throws UnexpectedErrorException {
         String encodedMessageStr = null;
         try {
             byte[] encodedMessage = null;
@@ -36,8 +37,8 @@ public class PublicCrypt {
             encodedMessage = cipher.doFinal(mensaje.getBytes());
             //Encoding encoded message to hexadecimal.
             encodedMessageStr = encodeHexadecimal(encodedMessage);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            throw new UnexpectedErrorException(ex);
         }
         
         return encodedMessageStr;
@@ -69,10 +70,6 @@ public class PublicCrypt {
             hexadecimalString += h;
         }
         return hexadecimalString.toUpperCase();
-    }
-    
-    public static void main(String[] args) {
-        System.out.println(encode("1234"));
     }
     
 }

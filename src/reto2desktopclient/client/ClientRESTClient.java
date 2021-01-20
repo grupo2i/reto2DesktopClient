@@ -4,6 +4,7 @@ import java.util.ResourceBundle;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 
 /**
  * Jersey REST client generated for REST resource:ClientFacadeREST
@@ -51,7 +52,7 @@ public class ClientRESTClient implements ClientManager {
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
-    public <T> T getAllClients(Class<T> responseType) throws ClientErrorException {
+    public <T> T getAllClients(GenericType<T> responseType) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path("getAllClients");
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);

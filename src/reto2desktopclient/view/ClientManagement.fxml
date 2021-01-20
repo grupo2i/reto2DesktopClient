@@ -10,12 +10,16 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="647.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="reto2desktopclient.view.ClientManagementController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+            minWidth="-Infinity" prefHeight="400.0" prefWidth="647.0"
+            xmlns="http://javafx.com/javafx/8.0.171"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="reto2desktopclient.view.ClientManagementController">
     <top>
         <fx:include fx:id="adminMenu" source="AdminMenu.fxml" />
     </top>
     <center>
-        <Pane fx:id="painContent" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <Pane fx:id="paneContent" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <children>
                 <TableView fx:id="tableClients" layoutX="24.0" layoutY="58.0" prefHeight="250.0" prefWidth="550.0">
                     <columns>
@@ -26,10 +30,14 @@
                         <TableColumn fx:id="tableColStatus" minWidth="0.0" prefWidth="84.0" text="Status" />
                     </columns>
                     <contextMenu>
-                        <ContextMenu fx:id="contectMenu">
+                        <ContextMenu fx:id="contextMenu">
                             <items>
-                                <MenuItem fx:id="menuItemNewClient" mnemonicParsing="false" text="New Client" />
-                                <MenuItem fx:id="menuItemSeeEvents" mnemonicParsing="false" text="See Events" />
+                                <MenuItem fx:id="menuItemNewClient"
+                                          mnemonicParsing="false" text="New Client" 
+                                          onAction="#handleNewClient"/>
+                                <MenuItem fx:id="menuItemSeeEvents"
+                                          mnemonicParsing="false" text="See Events" 
+                                          onAction="#handleSeeEvents"/>
                             </items>
                         </ContextMenu>
                     </contextMenu>
@@ -39,8 +47,13 @@
                         <Font size="18.0" />
                     </font>
                 </Label>
-                <Button fx:id="btnNewClient" layoutX="500.0" layoutY="319.0" mnemonicParsing="false" text="New Client" />
-                <Button fx:id="btnSeeEvents" layoutX="416.0" layoutY="319.0" mnemonicParsing="false" text="See Events" />
+                <Button fx:id="btnNewClient" layoutX="500.0" layoutY="319.0"
+                        mnemonicParsing="false" text="New Client"
+                        onAction="#handleNewClient"/>
+                <Button fx:id="btnSeeEvents" layoutX="416.0" layoutY="319.0"
+                        mnemonicParsing="false" text="See Events"
+                        onAction="#handleSeeEvents"/>
+            <Label fx:id="lblInputError" layoutX="39.0" layoutY="323.0" prefHeight="17.0" prefWidth="310.0" text="* User input error" textFill="RED" />
             </children>
         </Pane>
     </center>

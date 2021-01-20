@@ -131,7 +131,6 @@ public class LogInController {
             controller.initStage(root);
         } catch (IOException ex) {
             LOGGER.log(Level.SEVERE, "Could not switch to ClientManagement window: {0}", ex.getMessage());
-            throw new UnexpectedErrorException();
         }
       
     }
