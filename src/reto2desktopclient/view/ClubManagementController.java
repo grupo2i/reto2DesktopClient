@@ -432,7 +432,7 @@ public class ClubManagementController {
             clubTable.setItems(clubData);
             LOGGER.log(Level.INFO, "Club was added succesfuly");
             resetFieldsAndLabels();
-
+          
         } catch (ClientErrorException | UnexpectedErrorException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK);
             alert.showAndWait();
