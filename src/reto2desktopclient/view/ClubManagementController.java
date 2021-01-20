@@ -5,6 +5,7 @@
  */
 package reto2desktopclient.view;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.LocalDate;
@@ -13,13 +14,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javafx.beans.Observable;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -30,12 +36,16 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
+import reto2desktopclient.client.ClientManagerFactory;
 import reto2desktopclient.client.ClubManagerFactory;
+import reto2desktopclient.exceptions.UnexpectedErrorException;
 import reto2desktopclient.exceptions.UserInputException;
+import reto2desktopclient.model.Client;
 import reto2desktopclient.model.Club;
 import reto2desktopclient.model.UserPrivilege;
 import reto2desktopclient.model.UserStatus;
@@ -53,8 +63,6 @@ public class ClubManagementController {
     private Stage stage;
     @FXML
     private TableView clubTable;
-    @FXML
-    private TableColumn tableId;
     @FXML
     private TableColumn tableLogin;
     @FXML
@@ -100,8 +108,6 @@ public class ClubManagementController {
     @FXML
     private Button btnDelete;
     @FXML
-    private Button btnBack;
-    @FXML
     private Button btnUpdate;
     @FXML
     private Button btnSeeEvents;
@@ -117,6 +123,8 @@ public class ClubManagementController {
     private Label lblErrorPhoneNumber;
     @FXML
     private Label lblErrorStatus;
+
+    private ObservableList clubData;
 
     boolean errorLoginLenght = true;
     boolean usernameExists = true;
@@ -138,7 +146,7 @@ public class ClubManagementController {
         stage.setTitle("Club Management");
         stage.setResizable(false);
         stage.setOnShowing(this::handleWindowShowing);
-
+        Logger.getLogger(ClubManagementController.class.getName()).log(Level.INFO, "Showing stage...");
         stage.show();
     }
 
@@ -151,31 +159,74 @@ public class ClubManagementController {
     }
 
     private void handleWindowShowing(WindowEvent event) {
-        lblErrorLogin.setVisible(false);
-        lblErrorEmail.setVisible(false);
-        lblErrorName.setVisible(false);
-        lblErrorLocation.setVisible(false);
-        lblErrorPhoneNumber.setVisible(false);
-        lblErrorStatus.setVisible(false);
-        btnAdd.setDisable(true);
-        btnUpdate.setDisable(true);
-        btnDelete.setDisable(true);
-        btnSeeEvents.setDisable(true);
-        txtLogin.requestFocus();
-        btnAdd.setTooltip(
-                new Tooltip("Insert data to add club"));
-        btnDelete.setTooltip(
-                new Tooltip("Select club to disable"));
-        btnUpdate.setTooltip(
-                new Tooltip("Select club to update"));
-        txtLogin.textProperty().addListener(this::handleTextLogin);
-        txtEmail.textProperty().addListener(this::handleTextEmail);
-        txtName.textProperty().addListener(this::handleTextName);
-        txtLocation.textProperty().addListener(this::handleTextLocation);
-        txtPhoneNumber.textProperty().addListener(this::handleTextPhoneNumber);
-        txtStatus.textProperty().addListener(this::handleTextStatus);
+        try {
+            lblErrorLogin.setVisible(false);
+            lblErrorEmail.setVisible(false);
+            lblErrorName.setVisible(false);
+            lblErrorLocation.setVisible(false);
+            lblErrorPhoneNumber.setVisible(false);
+            lblErrorStatus.setVisible(false);
+            btnAdd.setDisable(true);
+            btnUpdate.setDisable(true);
+            btnDelete.setDisable(true);
+            btnSeeEvents.setDisable(true);
+            txtLogin.requestFocus();
+            btnAdd.setTooltip(
+                    new Tooltip("Insert data to add club"));
+            btnDelete.setTooltip(
+                    new Tooltip("Select club to disable"));
+            btnUpdate.setTooltip(
+                    new Tooltip("Select club to update"));
+            txtLogin.textProperty().addListener(this::handleTextLogin);
+            txtEmail.textProperty().addListener(this::handleTextEmail);
+            txtName.textProperty().addListener(this::handleTextName);
+            txtLocation.textProperty().addListener(this::handleTextLocation);
+            txtPhoneNumber.textProperty().addListener(this::handleTextPhoneNumber);
+            txtStatus.textProperty().addListener(this::handleTextStatus);
 
-        Logger.getLogger(LogInController.class.getName()).log(Level.INFO, "Showing stage...");
+            //Stablishing cell value factories on table columns...
+            tableLogin.setCellValueFactory(new PropertyValueFactory<>("login"));
+            tableEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+            tableName.setCellValueFactory(new PropertyValueFactory<>("fullName"));
+            tableLastAccess.setCellValueFactory(new PropertyValueFactory<>("lastAccess"));
+            tableLocation.setCellValueFactory(new PropertyValueFactory<>("location"));
+            tablePhoneNumber.setCellValueFactory(new PropertyValueFactory<>("phoneNum"));
+            tableStatus.setCellValueFactory(new PropertyValueFactory<>("userStatus"));
+            //Creating a Club observable List with all registered clubs.
+            clubData = FXCollections.observableList(ClubManagerFactory
+                    .getClubManager().getAllClubs(new GenericType<List<Club>>() {
+                    }));
+            //Setting the table model to the observable list above.
+            clubTable.setItems(clubData);
+            //Setting table selection listener.
+            clubTable.getSelectionModel().selectedItemProperty()
+                    .addListener(this::handleClubTableSelectionChange);
+
+            Logger.getLogger(LogInController.class.getName()).log(Level.INFO, "Showing stage...");
+        } catch (ClientErrorException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage());
+        }
+
+    }
+
+    private void handleClubTableSelectionChange(ObservableValue observable,
+            Object oldVaue, Object newValue) {
+        if (newValue != null) { //A row of the table is selected.
+            //Enable See Events button and menu item.
+            btnSeeEvents.setDisable(false);
+            btnDelete.setDisable(false);
+            btnUpdate.setDisable(false);
+            Club selectedClub = ((Club) clubTable.getSelectionModel().getSelectedItem());
+            txtEmail.setText(selectedClub.getEmail());
+            txtLocation.setText(selectedClub.getLocation());
+            txtLogin.setText(selectedClub.getLogin());
+            txtName.setText(selectedClub.getFullName());
+            txtPhoneNumber.setText(selectedClub.getPhoneNum());
+            txtStatus.setText(selectedClub.getUserStatus().toString());
+        } else { //There isn't any row selected.
+            //Disable See Events button and menu item.
+            btnSeeEvents.setDisable(true);
+        }
     }
 
     private void handleTextLogin(Observable obs) {
@@ -339,70 +390,151 @@ public class ClubManagementController {
         Integer encontradoMail = 0;
 
         try {
+            usernameExists = findLogin();
             Club club = new Club();
-            List<Club> clubfind = ClubManagerFactory.getClubManager()
-                    .getAllClubs(new GenericType<List<Club>>() {
-                    });
-
-            for (int x = 0; x < clubfind.size(); x++) {
-                if (clubfind.get(x).getLogin().equals(txtLogin.getText())) {
-                    usernameExists = true;
-                    encontradoUsername = x;
-                    break;
-                } else {
-                    usernameExists = false;
-                }
-            }
             if (usernameExists) {
-                LOGGER.log(Level.SEVERE, "Username with login: " + clubfind.get(encontradoUsername).getLogin() + " already in use");
-                Alert alert = new Alert(Alert.AlertType.WARNING, "Username " + clubfind.get(encontradoUsername).getLogin() + " already exists", ButtonType.OK);
+                LOGGER.log(Level.SEVERE, "Login username already in use");
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Login username already exists", ButtonType.OK);
                 alert.showAndWait();
+                btnAdd.setDisable(true);
+                btnUpdate.setDisable(true);
             } else {
                 club.setLogin(txtLogin.getText());
+                btnAdd.setDisable(false);
+                btnUpdate.setDisable(false);
             }
-            Club clubmail = new Club();
-            List<Club> clubfindmail = ClubManagerFactory.getClubManager()
-                    .getAllClubs(new GenericType<List<Club>>() {
-                    });
-            for (int x = 0; x < clubfindmail.size(); x++) {
-                if (clubfindmail.get(x).getEmail().equals(txtEmail.getText())) {
-                    emailExists = true;
-                    encontradoMail = x;
-                    break;
-                } else {
-                    emailExists = false;
-                }
-            }
+            emailExists = findEmail();
             if (emailExists) {
-                LOGGER.log(Level.SEVERE, "Email: " + clubfindmail.get(encontradoMail).getEmail() + " already in use");
-                Alert alert = new Alert(Alert.AlertType.WARNING, "Email " + clubfind.get(encontradoMail).getEmail() + " already exists", ButtonType.OK);
+                LOGGER.log(Level.SEVERE, "Email already in use");
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Email already exists", ButtonType.OK);
                 alert.showAndWait();
+                btnAdd.setDisable(true);
+                btnUpdate.setDisable(true);
             } else {
                 club.setEmail(txtEmail.getText());
+                btnAdd.setDisable(false);
+                btnUpdate.setDisable(false);
             }
-            String password="defaultPassword";
+            String password = "defaultPassword";
             String encodedPassword = PublicCrypt.encode(password);
             club.setPassword(encodedPassword);
             club.setUserPrivilege(UserPrivilege.CLUB);
-            club.setBiography("HOLA HOLA");
             club.setFullName(txtName.getText());
             club.setLocation(txtLocation.getText());
             club.setPhoneNum(txtPhoneNumber.getText());
             club.setUserStatus(UserStatus.valueOf(txtStatus.getText().toUpperCase()));
-            club.setLastAccess(Timestamp.valueOf(LocalDateTime.now()));
             club.setLastPasswordChange(Timestamp.valueOf(LocalDateTime.now()));
-            club.setProfileImage("salchichon");
+            club.setProfileImage("user.png");
             ClubManagerFactory.getClubManager().create(club);
+            clubData = FXCollections.observableList(ClubManagerFactory
+                    .getClubManager().getAllClubs(new GenericType<List<Club>>() {
+                    }));
+            clubTable.setItems(clubData);
             LOGGER.log(Level.INFO, "Club was added succesfuly");
             resetFieldsAndLabels();
+
+        } catch (ClientErrorException | UnexpectedErrorException ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK);
+            alert.showAndWait();
+            Logger.getLogger(LogInController.class.getName()).log(Level.SEVERE, ex.getMessage());
+        }
+    }
+
+    @FXML
+    public void handleButtonDelete(ActionEvent event) throws UserInputException {
+        try {
+            //Get selected club data from table view model
+            Club selectedClub = ((Club) clubTable.getSelectionModel().getSelectedItem());
+            //Ask user for confirmation on delete
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                    "Are you sure you want to delete the selected club?\n"
+                    + "This option can't be reversed.",
+                    ButtonType.OK, ButtonType.CANCEL);
+            Optional<ButtonType> result = alert.showAndWait();
+            //If OK to deletion
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                //delete user from server side
+                ClubManagerFactory.getClubManager().remove(selectedClub.getId().toString());
+                //clears editing fields
+                resetFieldsAndLabels();
+                //Clear selection and refresh table view 
+                clubTable.getSelectionModel().clearSelection();
+                clubData = FXCollections.observableList(ClubManagerFactory
+                        .getClubManager().getAllClubs(new GenericType<List<Club>>() {
+                        }));
+                clubTable.setItems(clubData);
+                LOGGER.log(Level.INFO, "Club was deleted succesfuly");
+            }
         } catch (ClientErrorException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK);
             alert.showAndWait();
             Logger.getLogger(LogInController.class.getName()).log(Level.SEVERE, ex.getMessage());
         }
     }
-    public void handleButtonDelete(ActionEvent event) throws UserInputException {
-        
+
+    @FXML
+    public void handleButtonUpdate(ActionEvent event) throws UserInputException {
+        Club selectedClub = ((Club) clubTable.getSelectionModel().getSelectedItem());
+        handleTextLogin(clubData);
+        handleTextEmail(clubData);
+        handleTextLocation(clubData);
+        handleTextName(clubData);
+        handleTextPhoneNumber(clubData);
+        handleTextStatus(clubData);
+        usernameExists = false;
+        emailExists = false;
+        if (!selectedClub.getLogin().equals(txtLogin.getText())) {
+            usernameExists = findLogin();
+        }
+        if (usernameExists) {
+            LOGGER.log(Level.SEVERE, "Login username already in use");
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Login username already exists", ButtonType.OK);
+            alert.showAndWait();
+            btnAdd.setDisable(true);
+            btnUpdate.setDisable(true);
+        } else {
+            selectedClub.setLogin(txtLogin.getText());
+            btnAdd.setDisable(false);
+            btnUpdate.setDisable(false);
+        }
+        if (!selectedClub.getEmail().equals(txtEmail.getText())) {
+            emailExists = findEmail();
+        }
+        if (emailExists) {
+            LOGGER.log(Level.SEVERE, "Email already in use");
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Email already in use", ButtonType.OK);
+            alert.showAndWait();
+            btnAdd.setDisable(true);
+            btnUpdate.setDisable(true);
+        } else {
+            selectedClub.setEmail(txtEmail.getText());
+            btnAdd.setDisable(false);
+            btnUpdate.setDisable(false);
+        }
+        selectedClub.setLocation(txtLocation.getText());
+        selectedClub.setFullName(txtName.getText());
+        selectedClub.setPhoneNum(txtPhoneNumber.getText());
+        selectedClub.setUserStatus(UserStatus.valueOf(txtStatus.getText().toUpperCase()));
+        ClubManagerFactory.getClubManager().edit(selectedClub);
+    }
+
+    @FXML
+    public void handleButtonSeeEvents(ActionEvent event) throws UserInputException {
+        Club selectedClub = ((Club) clubTable.getSelectionModel().getSelectedItem());
+        try {
+            LOGGER.log(Level.INFO, "Redirecting to event window.");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/EventManagement.fxml"));
+            Parent root = (Parent) loader.load();
+            //Getting window controller.
+            EventManagementController controller = (loader.getController());
+            //Setting club login to display its events
+            //controller.setUserLogin(selectedClub.getLogin());
+            controller.setStage(stage);
+            //Initializing stage.
+            controller.initStage(root);
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, "Could not switch to EventManagement window: {0}", ex.getMessage());
+        }
     }
 
     private void testLabels() {
@@ -410,22 +542,56 @@ public class ClubManagementController {
         if (errorStatusPattern || errorStatusPattern || errorNameLenght || errorNamePattern || errorEmailPattern
                 || errorEmailLenght || errorLocationLenght || errorPhoneNumberLenght || errorPhoneNumberPattern) {
             btnAdd.setDisable(true);
+            btnUpdate.setDisable(true);
         } else {
             btnAdd.setDisable(false);
+            btnUpdate.setDisable(false);
         }
     }
 
     private void resetFieldsAndLabels() {
-            txtEmail.setText("");
-            txtLocation.setText("");
-            txtLogin.setText("");
-            txtName.setText("");
-            txtPhoneNumber.setText("");
-            txtStatus.setText("");
-            lblErrorEmail.setVisible(false);
-            lblErrorLocation.setVisible(false);
-            lblErrorLogin.setVisible(false);
-            lblErrorName.setVisible(false);
-            lblErrorPhoneNumber.setVisible(false);
-            lblErrorStatus.setVisible(false);    }
+        txtEmail.setText("");
+        txtLocation.setText("");
+        txtLogin.setText("");
+        txtName.setText("");
+        txtPhoneNumber.setText("");
+        txtStatus.setText("");
+        lblErrorEmail.setVisible(false);
+        lblErrorLocation.setVisible(false);
+        lblErrorLogin.setVisible(false);
+        lblErrorName.setVisible(false);
+        lblErrorPhoneNumber.setVisible(false);
+        lblErrorStatus.setVisible(false);
+    }
+
+    private boolean findLogin() {
+        List<Club> clubfind = ClubManagerFactory.getClubManager()
+                .getAllClubs(new GenericType<List<Club>>() {
+                });
+
+        for (int x = 0; x < clubfind.size(); x++) {
+            if (clubfind.get(x).getLogin().equals(txtLogin.getText())) {
+                usernameExists = true;
+                break;
+            } else {
+                usernameExists = false;
+            }
+        }
+        return usernameExists;
+    }
+
+    private boolean findEmail() {
+        List<Club> clubfindmail = ClubManagerFactory.getClubManager()
+                .getAllClubs(new GenericType<List<Club>>() {
+                });
+        for (int x = 0; x < clubfindmail.size(); x++) {
+            if (clubfindmail.get(x).getEmail().equals(txtEmail.getText())) {
+                emailExists = true;
+                break;
+            } else {
+                emailExists = false;
+            }
+        }
+        return emailExists;
+    }
 }

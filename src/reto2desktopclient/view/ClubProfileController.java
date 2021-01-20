@@ -30,6 +30,7 @@ import javafx.stage.WindowEvent;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
 import reto2desktopclient.client.ClubManagerFactory;
+import reto2desktopclient.exceptions.UnexpectedErrorException;
 import reto2desktopclient.exceptions.UserInputException;
 import reto2desktopclient.model.Club;
 import reto2desktopclient.model.UserPrivilege;
@@ -141,6 +142,7 @@ public class ClubProfileController {
         lblErrorBiography.setVisible(false);
         btnSaveChanges.setDisable(true);
         txtEmail.setText("Aqui va el mail del club");
+        txtEmail.setDisable(true);
         txtName.requestFocus();
         txtLogin.textProperty().addListener(this::handleTextLogin);
         txtName.textProperty().addListener(this::handleTextName);
@@ -333,7 +335,7 @@ public class ClubProfileController {
             club.setBiography(txtBiography.getText().toString());
             ClubManagerFactory.getClubManager().edit(club);
             LOGGER.log(Level.INFO, "Club profile was updated succesfuly");
-        } catch (ClientErrorException ex) {
+        } catch (ClientErrorException | UnexpectedErrorException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK);
             alert.showAndWait();
             Logger.getLogger(LogInController.class.getName()).log(Level.SEVERE, ex.getMessage());
