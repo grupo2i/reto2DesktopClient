@@ -1,6 +1,7 @@
 package reto2desktopclient.view;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.Observable;
@@ -93,18 +94,27 @@ public class LogInController {
                     //Retrieving User from signIn method.
                     user = UserManagerFactory.getUserManager().signIn(
                             User.class, txtUsername.getText(), encodedPassword);
+                    //Updating users last access...
+                    user.setLastAccess(new Date());
+                    UserManagerFactory.getUserManager().edit(user);
                     switchToClientManagementWindow();
                     break;
                 case ARTIST:
                     //Retrieving Artist from signIn method.
                     Artist artist = UserManagerFactory.getUserManager().signIn(
                             Artist.class, txtUsername.getText(), encodedPassword);
+                    //Updating artists last access...
+                    artist.setLastAccess(new Date());
+                    UserManagerFactory.getUserManager().edit(artist);
                     switchToArtistProfileWindow();
                     break;
                 case CLUB:
                     //Retrieving Club from signIn method.
                     Club club = UserManagerFactory.getUserManager().signIn(
                             Club.class, txtUsername.getText(), encodedPassword);
+                    //Updating clubs last access...
+                    club.setLastAccess(new Date());
+                    UserManagerFactory.getUserManager().edit(club);
                     switchToClubProfileWindow();
                     break;
             }
