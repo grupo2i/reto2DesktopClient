@@ -20,6 +20,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
@@ -33,7 +35,6 @@ import reto2desktopclient.model.Club;
 import reto2desktopclient.model.UserPrivilege;
 import reto2desktopclient.model.UserStatus;
 import reto2desktopclient.security.PublicCrypt;
-
 
 /**
  *
@@ -78,13 +79,13 @@ public class ClubProfileController {
     @FXML
     private Label lblPassword;
     @FXML
-    private TextField txtPassword;
+    private PasswordField pwdPassword;
     @FXML
     private Label lblErrorPassword;
     @FXML
     private Label lblBiography;
     @FXML
-    private TextField txtBiography;
+    private TextArea txtBiography;
     @FXML
     private Label lblErrorBiography;
     @FXML
@@ -103,6 +104,15 @@ public class ClubProfileController {
     boolean errorPhoneNumberPattern = true;
     boolean errorPasswordLenght = true;
     boolean errorBiographyLenght = true;
+    private Club clubSign;
+
+    public Club getClubSign() {
+        return clubSign;
+    }
+
+    public void setClubSign(Club clubSign) {
+        this.clubSign = clubSign;
+    }
 
     public void initStage(Parent root) {
         Scene scene = new Scene(root);
@@ -111,6 +121,13 @@ public class ClubProfileController {
         stage.setTitle("Club Profile");
         stage.setResizable(false);
         stage.setOnShowing(this::handleWindowShowing);
+       /* txtName.setText(clubSign.getFullName());
+        txtLogin.setText(clubSign.getLogin());
+        txtEmail.setText(clubSign.getEmail());
+        txtLocation.setText(clubSign.getLocation());
+        txtPhoneNumber.setText(clubSign.getPhoneNum());
+        pwdPassword.setText(clubSign.getPassword());
+        txtBiography.setText(clubSign.getBiography());*/
         stage.show();
     }
 
@@ -129,7 +146,7 @@ public class ClubProfileController {
         txtName.textProperty().addListener(this::handleTextName);
         txtLocation.textProperty().addListener(this::handleTextLocation);
         txtPhoneNumber.textProperty().addListener(this::handleTextPhoneNumber);
-        txtPassword.textProperty().addListener(this::handleTextPassword);
+        pwdPassword.textProperty().addListener(this::handleTextPassword);
         txtBiography.textProperty().addListener(this::handleTextBiography);
 
         Logger.getLogger(LogInController.class.getName()).log(Level.INFO, "Showing stage...");
@@ -230,7 +247,7 @@ public class ClubProfileController {
     }
 
     private void handleTextPassword(Observable obs) {
-        Integer pwdPasswordLength = txtPassword.getText().trim().length();
+        Integer pwdPasswordLength = pwdPassword.getText().trim().length();
 
         //If there is any error with pwdPassword...
         if (pwdPasswordLength < 6 || pwdPasswordLength > 255) {
@@ -308,16 +325,14 @@ public class ClubProfileController {
             } else {
                 club.setLogin(txtLogin.getText());
             }
-            String encodedPassword= PublicCrypt.encode(txtPassword.getText());
-            club.setPassword(password);
-            club.setUserPrivilege(UserPrivilege.CLUB);
-            club.setBiography("HOLA HOLA");
+            String encodedPassword = PublicCrypt.encode(pwdPassword.getText());
+            club.setPassword(encodedPassword);
             club.setFullName(txtName.getText());
             club.setLocation(txtLocation.getText());
             club.setPhoneNum(txtPhoneNumber.getText());
-            club.setUserStatus(UserStatus.valueOf(txtStatus.getText().toUpperCase()));
-            ClubManagerFactory.getClubManager().create(club);
-            LOGGER.log(Level.INFO, "Club was added succesfuly");
+            club.setBiography(txtBiography.getText().toString());
+            ClubManagerFactory.getClubManager().edit(club);
+            LOGGER.log(Level.INFO, "Club profile was updated succesfuly");
         } catch (ClientErrorException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK);
             alert.showAndWait();
@@ -332,6 +347,4 @@ public class ClubProfileController {
     public void setStage(Stage primaryStage) {
         stage = primaryStage;
     }
-
-
 }

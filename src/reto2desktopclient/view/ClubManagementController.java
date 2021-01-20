@@ -5,6 +5,10 @@
  */
 package reto2desktopclient.view;
 
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.ArrayList;
@@ -35,6 +39,7 @@ import reto2desktopclient.exceptions.UserInputException;
 import reto2desktopclient.model.Club;
 import reto2desktopclient.model.UserPrivilege;
 import reto2desktopclient.model.UserStatus;
+import reto2desktopclient.security.PublicCrypt;
 
 /**
  *
@@ -376,20 +381,28 @@ public class ClubManagementController {
                 club.setEmail(txtEmail.getText());
             }
             String password="defaultPassword";
-            club.setPassword(password);
+            String encodedPassword = PublicCrypt.encode(password);
+            club.setPassword(encodedPassword);
             club.setUserPrivilege(UserPrivilege.CLUB);
             club.setBiography("HOLA HOLA");
             club.setFullName(txtName.getText());
             club.setLocation(txtLocation.getText());
             club.setPhoneNum(txtPhoneNumber.getText());
             club.setUserStatus(UserStatus.valueOf(txtStatus.getText().toUpperCase()));
+            club.setLastAccess(Timestamp.valueOf(LocalDateTime.now()));
+            club.setLastPasswordChange(Timestamp.valueOf(LocalDateTime.now()));
+            club.setProfileImage("salchichon");
             ClubManagerFactory.getClubManager().create(club);
             LOGGER.log(Level.INFO, "Club was added succesfuly");
+            resetFieldsAndLabels();
         } catch (ClientErrorException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK);
             alert.showAndWait();
             Logger.getLogger(LogInController.class.getName()).log(Level.SEVERE, ex.getMessage());
         }
+    }
+    public void handleButtonDelete(ActionEvent event) throws UserInputException {
+        
     }
 
     private void testLabels() {
@@ -401,4 +414,18 @@ public class ClubManagementController {
             btnAdd.setDisable(false);
         }
     }
+
+    private void resetFieldsAndLabels() {
+            txtEmail.setText("");
+            txtLocation.setText("");
+            txtLogin.setText("");
+            txtName.setText("");
+            txtPhoneNumber.setText("");
+            txtStatus.setText("");
+            lblErrorEmail.setVisible(false);
+            lblErrorLocation.setVisible(false);
+            lblErrorLogin.setVisible(false);
+            lblErrorName.setVisible(false);
+            lblErrorPhoneNumber.setVisible(false);
+            lblErrorStatus.setVisible(false);    }
 }
