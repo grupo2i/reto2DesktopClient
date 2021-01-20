@@ -68,8 +68,6 @@ public class ClubProfileController {
     @FXML
     private TextField txtEmail;
     @FXML
-    private Label lblErrorEmail;
-    @FXML
     private Label lblLocation;
     @FXML
     private TextField txtLocation;
@@ -138,7 +136,6 @@ public class ClubProfileController {
 
     private void handleWindowShowing(WindowEvent event) {
         lblErrorLogin.setVisible(false);
-        lblErrorEmail.setVisible(false);
         lblErrorName.setVisible(false);
         lblErrorLocation.setVisible(false);
         lblErrorPhoneNumber.setVisible(false);
@@ -179,7 +176,7 @@ public class ClubProfileController {
 
     private void handleTextName(Observable obs) {
         Integer txtNameLength = txtName.getText().trim().length();
-        Pattern patternName = Pattern.compile("^([A-Za-z]+[ ]?)+$");
+        Pattern patternName = Pattern.compile("^([A-zÀ-ú]+[ ]?)+$");
         Matcher matcherName = patternName.matcher(txtName.getText());
 
         if (txtNameLength == 0 || txtNameLength > 255 || !matcherName.matches()) {
@@ -267,7 +264,7 @@ public class ClubProfileController {
             errorPasswordLenght = true;
             lblErrorPassword.setVisible(true);
         } else {
-            errorPasswordLenght = true;
+            errorPasswordLenght = false;
             lblErrorPassword.setVisible(false);
         }
         testLabels();
@@ -288,7 +285,7 @@ public class ClubProfileController {
             errorBiographyLenght = true;
             lblErrorBiography.setVisible(true);
         } else {
-            errorBiographyLenght = true;
+            errorBiographyLenght = false;
             lblErrorBiography.setVisible(false);
         }
         testLabels();

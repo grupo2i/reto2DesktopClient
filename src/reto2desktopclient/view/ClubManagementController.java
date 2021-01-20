@@ -147,6 +147,7 @@ public class ClubManagementController {
         stage.setResizable(false);
         stage.setOnShowing(this::handleWindowShowing);
         Logger.getLogger(ClubManagementController.class.getName()).log(Level.INFO, "Showing stage...");
+        stage.hide();
         stage.show();
     }
 
@@ -280,7 +281,7 @@ public class ClubManagementController {
 
     private void handleTextName(Observable obs) {
         Integer txtNameLength = txtName.getText().trim().length();
-        Pattern patternName = Pattern.compile("^([A-Za-z]+[ ]?)+$");
+        Pattern patternName = Pattern.compile("^([A-zÀ-ú]+[ ]?)+$");
         Matcher matcherName = patternName.matcher(txtName.getText());
 
         if (txtNameLength == 0 || txtNameLength > 255 || !matcherName.matches()) {
@@ -528,7 +529,7 @@ public class ClubManagementController {
             //Getting window controller.
             EventManagementController controller = (loader.getController());
             //Setting club login to display its events
-            //controller.setUserLogin(selectedClub.getLogin());
+            controller.setUserLogin(selectedClub.getLogin());
             controller.setStage(stage);
             //Initializing stage.
             controller.initStage(root);
