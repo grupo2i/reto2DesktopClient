@@ -9,7 +9,6 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.BorderPane?>
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="490.0" prefWidth="623.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="reto2desktopclient.view.ClubProfileController">
     <children>
@@ -40,10 +39,7 @@
         <Label fx:id="lblErrorPhoneNumber" layoutX="442.0" layoutY="171.0" text="* error" textFill="RED" />
         <Label fx:id="lblErrorPassword" layoutX="442.0" layoutY="203.0" text="* error" textFill="RED" />
         <Label fx:id="lblErrorBiography" layoutX="265.0" layoutY="425.0" text="* error" textFill="RED" />
-        <BorderPane prefHeight="1" prefWidth="1">
-            <top>
-                <fx:include fx:id="adminMenu" source="AdminMenu.fxml" />
-            </top> 
-        </BorderPane>
+      <Button fx:id="btnLogOut" layoutX="15.0" layoutY="451.0" mnemonicParsing="false" text="Log Out" />
+        
     </children>
 </Pane>
