@@ -24,6 +24,21 @@ public class AdminMenuController {
     @FXML
     private Stage stage;
 
+    private void handleButtonLogOut(ActionEvent event) {
+        try {
+            LOGGER.log(Level.INFO, "Redirecting to LogIn window.");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/LogIn.fxml"));
+            Parent root = (Parent) loader.load();
+            //Getting window controller.
+            LogInController controller = (loader.getController());
+            controller.setStage(stage);
+            //Initializing stage.
+            controller.initStage(root);
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, "Could not switch to LogIn window: {0}", ex.getMessage());
+        }
+    }
+    
     /**
      * Handles the onAction event over the Manage Clients menuItem by switching
      * to Client Management window.

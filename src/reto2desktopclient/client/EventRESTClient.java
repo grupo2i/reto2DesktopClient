@@ -1,9 +1,12 @@
 package reto2desktopclient.client;
 
 import java.util.ResourceBundle;
+import java.util.List;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
+import reto2desktopclient.model.Event;
 
 /**
  * Jersey REST client generated for REST resource:EventFacadeREST
@@ -45,7 +48,7 @@ public class EventRESTClient implements EventManager {
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
     }
 
-    public <T> T getAllEvents(Class<T> responseType) throws ClientErrorException {
+    public <T> T getAllEvents(GenericType<T> responseType) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path("getAllEvents");
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);

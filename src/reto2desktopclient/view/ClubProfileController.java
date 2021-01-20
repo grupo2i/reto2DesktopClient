@@ -35,13 +35,16 @@ import reto2desktopclient.model.Club;
 import reto2desktopclient.model.UserPrivilege;
 import reto2desktopclient.model.UserStatus;
 import reto2desktopclient.security.PublicCrypt;
+import javafx.fxml.FXML;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 /**
  *
  * @author Ander
  */
 public class ClubProfileController {
-
     private static final Logger LOGGER = Logger.getLogger(ClubProfileController.class.getName());
 
     @FXML
@@ -340,11 +343,12 @@ public class ClubProfileController {
         }
     }
 
+
     public Stage getStage() {
         return stage;
     }
 
-    public void setStage(Stage primaryStage) {
-        stage = primaryStage;
+    public void setStage(Stage stage) {
+        this.stage = stage;
     }
 }
