@@ -6,24 +6,17 @@
 package reto2desktopclient.view;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
@@ -38,8 +31,7 @@ import reto2desktopclient.client.EventManagerFactory;
 import reto2desktopclient.model.Event;
 
 /**
- * TODO: Validate item not col or row in table.
- * https://docs.oracle.com/javafx/2/ui_controls/table-view.htm
+ * 
  * @author Martin Angulo
  */
 public class EventManagementController {
@@ -111,10 +103,16 @@ public class EventManagementController {
             }
         });
         colDate.setOnEditCommit((CellEditEvent<Event, Date> t) -> {
-            Event currEvent = t.getRowValue();
-            currEvent.setDate(t.getNewValue());
-            eventManager.edit(currEvent);
-            tblEvents.refresh();
+            if(t.getNewValue() == null && 
+                !lblError.getText().equals("* Date must have format: mm/dd/yy\nand be possible.")) {
+                lblError.setText("* Field must not be empty.");
+                lblError.setVisible(true);
+            } else {
+                Event currEvent = t.getRowValue();
+                currEvent.setDate(t.getNewValue());
+                eventManager.edit(currEvent);
+                tblEvents.refresh();
+            }
         });
         colPlace.setOnEditCommit((CellEditEvent<Event, String> t) -> {
             if(validateLength(t.getNewValue())) {
@@ -125,7 +123,7 @@ public class EventManagementController {
             }
         });
         colPrice.setOnEditCommit((CellEditEvent<Event, Float> t) -> {
-            if(validateLength(t.getNewValue().toString()) && validatePrice(t.getNewValue())) {
+            if(validatePrice(t.getNewValue()) && validateLength(t.getNewValue().toString())) {
                 Event currEvent = t.getRowValue();
                 currEvent.setTicketprice(t.getNewValue());
                 eventManager.edit(currEvent);
@@ -224,26 +222,12 @@ public class EventManagementController {
         return true;
     }
     
-    private Boolean validateDate(String date) {
-        if(!date.matches("\\d{2}/\\d{2}/\\d{2}")) {
-            lblError.setText("* Date must have format: mm/dd/yy");
-            lblError.setVisible(true);
-            return false;
-        }
-        SimpleDateFormat df = new SimpleDateFormat("MM/dd/yy");
-        df.setLenient(false);
-        try {
-            df.parse(date);
-            return true;
-        } catch (ParseException ex) {
-            lblError.setText("* Date must be possible");
-            lblError.setVisible(true);
-            return false;
-        }
-    }
-    
     private Boolean validatePrice(Float price) {
-        if(price < 0) {
+        if(price == null) {
+            lblError.setText("* Field must not be empty.");
+            lblError.setVisible(true);
+            return false;
+        } else if(price < 0) {
             lblError.setText("* Price cannot be negative");
             lblError.setVisible(true);
             return false;
@@ -265,11 +249,11 @@ public class EventManagementController {
                     lblError.setVisible(false);
                     return date;
 		} catch (RuntimeException ex) {
-                    if(newDate.isEmpty()) {
-                        lblError.setText("* Field must not be empty");
+                    if(newDate == null) {
+                        lblError.setText("* Field must not be empty.");
                         lblError.setVisible(true);
                     }else {
-                        lblError.setText("* Date must have format: mm/dd/yy");
+                        lblError.setText("* Date must have format: mm/dd/yy\nand be possible.");
                         lblError.setVisible(true);
                     }
                     return null;
