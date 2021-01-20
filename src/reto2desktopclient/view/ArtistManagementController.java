@@ -187,18 +187,4 @@ public class ArtistManagementController {
             btnUpdateArtist.setDisable(true);
         }
     }
-
-    public void initStage(Parent root) {
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
-    }
-    
-    public Stage getStage() {
-        return stage;
-    }
-
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
 }

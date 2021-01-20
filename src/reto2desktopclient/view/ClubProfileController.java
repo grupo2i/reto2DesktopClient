@@ -39,6 +39,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import reto2desktopclient.exceptions.UnexpectedErrorException;
 
 /**
  *
@@ -336,7 +337,7 @@ public class ClubProfileController {
             club.setBiography(txtBiography.getText().toString());
             ClubManagerFactory.getClubManager().edit(club);
             LOGGER.log(Level.INFO, "Club profile was updated succesfuly");
-        } catch (ClientErrorException ex) {
+        } catch (ClientErrorException | UnexpectedErrorException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK);
             alert.showAndWait();
             Logger.getLogger(LogInController.class.getName()).log(Level.SEVERE, ex.getMessage());
