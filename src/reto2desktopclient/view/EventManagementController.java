@@ -60,6 +60,8 @@ public class EventManagementController {
     @FXML
     private Label lblError;
     
+    private String userLogin;
+    
     /**
      * Initializes the scene and its components
      *
@@ -246,13 +248,14 @@ public class EventManagementController {
             // Catches the RuntimeException thrown by DateStringConverter.fromString()
             try {
                 Date date = super.fromString(newDate);
+                lblError.setText("");
                 lblError.setVisible(false);
                 return date;
             } catch (RuntimeException ex) {
                 if(newDate == null) {
                     lblError.setText("* Field must not be empty.");
                     lblError.setVisible(true);
-                }else {
+                } else {
                     lblError.setText("* Date must have format: mm/dd/yy\nand be possible.");
                     lblError.setVisible(true);
                 }
@@ -273,5 +276,13 @@ public class EventManagementController {
 	public String toString(Float price) {
             return super.toString(price) + "€";
 	}
+    }
+    
+    private String getUserLogin() {
+        return userLogin;
+    }
+    
+    private void setUserLogin(String login) {
+        userLogin = login;
     }
 }
