@@ -184,6 +184,7 @@ public class EventManagementController {
         tblEvents.getSelectionModel().clearSelection();
         tblEvents.getSelectionModel().select(tblEvents.getItems().size() - 1, colName);
         tblEvents.scrollTo(newEvent);
+        tblEvents.edit(tblEvents.getItems().size() - 1, colName);
         tblEvents.refresh();
     }
 
