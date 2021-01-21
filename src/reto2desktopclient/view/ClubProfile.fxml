@@ -24,7 +24,7 @@
         <TextField id="txtPhoneNumber" fx:id="txtPhoneNumber" layoutX="264.0" layoutY="167.0" prefHeight="25.0" prefWidth="172.0" promptText="Write the club phone number" />
         <PasswordField fx:id="pwdPassword" layoutX="265.0" layoutY="199.0" prefHeight="25.0" prefWidth="172.0" />
         <TextArea id="txtDescription" fx:id="txtBiography" layoutX="264.0" layoutY="238.0" prefHeight="187.0" prefWidth="344.0" promptText="Write the club biography" />
-        <Button id="btnSaveChanges" fx:id="btnSaveChanges" layoutX="521.0" layoutY="451.0" mnemonicParsing="false" text="Save changes" />
+        <Button id="btnSaveChanges" fx:id="btnSaveChanges" layoutX="521.0" layoutY="451.0" onAction="#handleButtonSaveChanges" mnemonicParsing="false" text="Save changes" />
         <ComboBox id="imgCombo" fx:id="comboImage" layoutX="35.0" layoutY="145.0" prefHeight="25.0" prefWidth="130.0" />
         <Label layoutX="198.0" layoutY="33.0" text="Club name:" />
         <Label layoutX="198.0" layoutY="69.0" text="Club login:" />
@@ -39,7 +39,7 @@
         <Label fx:id="lblErrorPhoneNumber" layoutX="442.0" layoutY="171.0" text="* error" textFill="RED" />
         <Label fx:id="lblErrorPassword" layoutX="442.0" layoutY="203.0" text="* error" textFill="RED" />
         <Label fx:id="lblErrorBiography" layoutX="265.0" layoutY="425.0" text="* error" textFill="RED" />
-      <Button fx:id="btnLogOut" layoutX="15.0" layoutY="451.0" mnemonicParsing="false" text="Log Out" />
+      <Button fx:id="btnLogOut" layoutX="15.0" layoutY="451.0" onAction="#handleButtonLogOut" mnemonicParsing="false" text="Log Out" />
         
     </children>
 </Pane>
