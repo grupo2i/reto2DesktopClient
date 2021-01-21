@@ -18,8 +18,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Cell;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableCell;
@@ -31,7 +29,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import javafx.util.converter.DateStringConverter;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
 import reto2desktopclient.client.ClientManager;
@@ -101,6 +98,8 @@ public class ClientManagementController {
      * @param root Parent of all nodes in the scene graph.
      */
     public void initStage(Parent root) {
+        LOGGER.log(Level.INFO, "Starting stage initialization for"
+                + " Client Management window...");
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.setTitle("Client Management");
@@ -133,6 +132,7 @@ public class ClientManagementController {
             //Making table editable.
             tableClients.setEditable(true);
 
+            LOGGER.log(Level.INFO, "Setting cell value factories on table columns...");
             //Setting cell value factories on table columns...
             tableColLogin.setCellValueFactory(new PropertyValueFactory<>("login"));
             tableColEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
@@ -140,6 +140,7 @@ public class ClientManagementController {
             tableColStatus.setCellValueFactory(new PropertyValueFactory<>("userStatus"));
             tableColLastAccess.setCellValueFactory(new PropertyValueFactory<>("lastAccess"));
 
+            LOGGER.log(Level.INFO, "Setting cell factories on table columns...");
             //Setting cell factory on table columns...
             tableColLogin.setCellFactory(TextFieldTableCell.forTableColumn());
             tableColEmail.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -166,6 +167,7 @@ public class ClientManagementController {
                 return cell;
             });
 
+            LOGGER.log(Level.INFO, "Setting table model...");
             //Creating a Client observable List with all registered clients.
             clientsData = FXCollections.observableList(CLIENT_MANAGER
                     .getAllClients(new GenericType<List<Client>>() {
@@ -180,6 +182,7 @@ public class ClientManagementController {
             //Setting edit commit event handler to login column.
             tableColLogin.setOnEditCommit(
                 (CellEditEvent<Client, String> t) -> {
+                    LOGGER.log(Level.INFO, "Handling Login column edit commit event...");
                     if (dataLengthIsValid(t.getNewValue())) {
                         Client newClient = t.getRowValue();
                         newClient.setLogin(t.getNewValue());
@@ -209,6 +212,8 @@ public class ClientManagementController {
                         //If login is not already registered update the database
                         //with the new Client.
                         if(loginIsValid) {
+                            LOGGER.log(Level.INFO, "Updating Clients login in the"
+                                    + " database on Login column edit commit handling...");
                             //Hiding login is already registered error message.
                             lblInputError.setVisible(false);
                             //Updating newClient in the database.
@@ -223,6 +228,7 @@ public class ClientManagementController {
             //Setting edit commit event handler to email column.
             tableColEmail.setOnEditCommit(
                 (CellEditEvent<Client, String> t) -> {
+                    LOGGER.log(Level.INFO, "Handling Email column edit commit event...");
                     if (dataLengthIsValid(t.getNewValue())
                     && emailPatternIsValid(t.getNewValue())) {
                         Client newClient = t.getRowValue();
@@ -253,6 +259,8 @@ public class ClientManagementController {
                         //If email is not already registered update the database
                         //with the new Client.
                         if(emailIsValid) {
+                            LOGGER.log(Level.INFO, "Updating Clients email in the"
+                                    + " database on Email column edit commit handling...");
                             //Hiding login is already registered error message.
                             lblInputError.setVisible(false);
                             //Updating newClient in the database.
@@ -267,11 +275,15 @@ public class ClientManagementController {
             //Setting edit commit event handler to full name column.
             tableColFullName.setOnEditCommit(
                 (CellEditEvent<Client, String> t) -> {
+                    LOGGER.log(Level.INFO, "Handling Full Name column edit commit event...");
                     if (dataLengthIsValid(t.getNewValue())) {
+                        LOGGER.log(Level.INFO, "Updating Clients full name in the"
+                                + " database on Full Name column edit commit handling...");
                         //Updating newClient in the database.
                         Client client = t.getRowValue();
                         client.setFullName(t.getNewValue());
                         CLIENT_MANAGER.edit(client);
+                        lblInputError.setVisible(false);
                     } else {
                         //Resetting old value if new value is not valid.
                         t.getRowValue().setFullName(t.getOldValue());
@@ -281,10 +293,14 @@ public class ClientManagementController {
             //Setting edit commit event handler to user status column.
             tableColStatus.setOnEditCommit(
                 (CellEditEvent<Client, UserStatus> t) -> {
+                    LOGGER.log(Level.INFO, "Handling Status column edit commit event...");
+                    Client newClient = t.getRowValue();
+                    newClient.setUserStatus(t.getNewValue());
                     //Updating newClient in the database.
-                    Client client = t.getRowValue();
-                    client.setUserStatus(t.getNewValue());
-                    CLIENT_MANAGER.edit(client);
+                    LOGGER.log(Level.INFO, "Updating Clients status in the database"
+                            + " on Status column edit commit handling...");
+                    CLIENT_MANAGER.edit(newClient);
+                    lblInputError.setVisible(false);
                 });
         } catch (ClientErrorException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage());
@@ -298,6 +314,7 @@ public class ClientManagementController {
      * @return True if the data is valid; False if not.
      */
     private boolean dataLengthIsValid(String data) {
+        LOGGER.log(Level.INFO, "Starting data length validation...");
         boolean dataIsValid = true;
 
         if (data.length() == 0) {
@@ -325,6 +342,7 @@ public class ClientManagementController {
      * @return True if the format is valid; False if not.
      */
     private boolean emailPatternIsValid(String email) {
+        LOGGER.log(Level.INFO, "Starting email pattern validation...");
         boolean emailIsValid = true;
 
         Pattern patternEmail = Pattern.compile("^[\\w-]+(\\.[\\w-]+)*@"
@@ -352,6 +370,7 @@ public class ClientManagementController {
      */
     private void handleClientsTableSelectionChange(ObservableValue observable,
             Object oldVaue, Object newValue) {
+        LOGGER.log(Level.INFO, "Handling table selection change...");
         if (newValue != null) { //A row of the table is selected.
             //Enable See Events button and menu item.
             btnSeeEvents.setDisable(false);
@@ -370,6 +389,7 @@ public class ClientManagementController {
      */
     @FXML
     private void handleNewClient(ActionEvent event) {
+        LOGGER.log(Level.INFO, "Handling New Client creation request...");
         try {
             //Creating a Client with null data.
             Client newClient = new Client();
@@ -383,6 +403,8 @@ public class ClientManagementController {
             Random random = new Random();
             newClient.setProfileImage(PROFILE_IMAGES[random.nextInt(PROFILE_IMAGES.length)]);
             //Register the new Client in the database.
+            LOGGER.log(Level.INFO, "Updating database with new Client on New"
+                    + " Client creation request handling...");
             CLIENT_MANAGER.create(newClient);
             //Adding the new Client to the tabla view.
             tableClients.getItems().add(newClient);
