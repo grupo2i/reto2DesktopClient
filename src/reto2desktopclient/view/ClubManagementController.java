@@ -123,6 +123,8 @@ public class ClubManagementController {
     private Label lblErrorPhoneNumber;
     @FXML
     private Label lblErrorStatus;
+    @FXML
+    private AdminMenuController adminMenuController;
 
     private ObservableList clubData;
 
@@ -138,6 +140,7 @@ public class ClubManagementController {
     boolean errorPhoneNumberPattern = true;
     boolean errorStatusLenght = true;
     boolean errorStatusPattern = true;
+    boolean tableIsSelected = false;
 
     public void initStage(Parent root) {
         Scene scene = new Scene(root);
@@ -145,6 +148,7 @@ public class ClubManagementController {
         stage.setScene(scene);
         stage.setTitle("Club Management");
         stage.setResizable(false);
+        adminMenuController.setStage(stage);
         stage.setOnShowing(this::handleWindowShowing);
         Logger.getLogger(ClubManagementController.class.getName()).log(Level.INFO, "Showing stage...");
         stage.hide();
@@ -212,8 +216,9 @@ public class ClubManagementController {
 
     private void handleClubTableSelectionChange(ObservableValue observable,
             Object oldVaue, Object newValue) {
+        tableIsSelected=true;
         if (newValue != null) { //A row of the table is selected.
-            //Enable See Events button and menu item.
+            //Enable See Events, delete and update buttons.
             btnSeeEvents.setDisable(false);
             btnDelete.setDisable(false);
             btnUpdate.setDisable(false);
@@ -224,9 +229,16 @@ public class ClubManagementController {
             txtName.setText(selectedClub.getFullName());
             txtPhoneNumber.setText(selectedClub.getPhoneNum());
             txtStatus.setText(selectedClub.getUserStatus().toString());
+            btnAdd.setDisable(true);
+            tableIsSelected=true;
         } else { //There isn't any row selected.
-            //Disable See Events button and menu item.
+            //Disable all buttons.
             btnSeeEvents.setDisable(true);
+            btnDelete.setDisable(true);
+            btnUpdate.setDisable(true);
+            btnAdd.setDisable(true);
+            resetFieldsAndLabels(); 
+            tableIsSelected=false;
         }
     }
 
@@ -539,14 +551,16 @@ public class ClubManagementController {
     }
 
     private void testLabels() {
-
         if (errorStatusPattern || errorStatusPattern || errorNameLenght || errorNamePattern || errorEmailPattern
                 || errorEmailLenght || errorLocationLenght || errorPhoneNumberLenght || errorPhoneNumberPattern) {
             btnAdd.setDisable(true);
             btnUpdate.setDisable(true);
         } else {
-            btnAdd.setDisable(false);
+            btnAdd.setDisable(false); 
+            if(tableIsSelected)
             btnUpdate.setDisable(false);
+            else
+            btnUpdate.setDisable(true);    
         }
     }
 
