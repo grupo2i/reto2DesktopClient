@@ -181,10 +181,39 @@ public class ClientManagementController {
             tableColLogin.setOnEditCommit(
                 (CellEditEvent<Client, String> t) -> {
                     if (dataLengthIsValid(t.getNewValue())) {
-                        //Updating newClient in the database.
                         Client newClient = t.getRowValue();
                         newClient.setLogin(t.getNewValue());
-                        CLIENT_MANAGER.edit(newClient);
+                        //Getting a list of all registered clients 
+                        //to check the login is not registered already.
+                        boolean loginIsValid = true;
+                        ObservableList<Client> clients = FXCollections.observableList(
+                                CLIENT_MANAGER.getAllClients(new GenericType<List<Client>>() {
+                        }));
+                        //Checking the login is not registered already...
+                        for(Client client:clients) {
+                            //Checking that the login is not null to avoid NullPointerException.
+                            if(client.getLogin() != null) {
+                                if(client.getLogin().equalsIgnoreCase(newClient.getLogin())) {
+                                    loginIsValid = false;
+                                    //Showing login is already registered error message.
+                                    lblInputError.setText("* Login is already registered.");
+                                    lblInputError.setVisible(true);
+                                    //Updating the table with the list of clients
+                                    //retrieved from database.
+                                    tableClients.setItems(clients);
+                                    tableClients.refresh();
+                                    break;
+                                }
+                            }
+                        }
+                        //If login is not already registered update the database
+                        //with the new Client.
+                        if(loginIsValid) {
+                            //Hiding login is already registered error message.
+                            lblInputError.setVisible(false);
+                            //Updating newClient in the database.
+                            CLIENT_MANAGER.edit(newClient);
+                        }
                     } else {
                         //Resetting old value if new value is not valid.
                         t.getRowValue().setLogin(t.getOldValue());
@@ -196,10 +225,39 @@ public class ClientManagementController {
                 (CellEditEvent<Client, String> t) -> {
                     if (dataLengthIsValid(t.getNewValue())
                     && emailPatternIsValid(t.getNewValue())) {
-                        //Updating newClient in the database.
-                        Client client = t.getRowValue();
-                        client.setEmail(t.getNewValue());
-                        CLIENT_MANAGER.edit(client);
+                        Client newClient = t.getRowValue();
+                        newClient.setEmail(t.getNewValue());
+                        boolean emailIsValid = true;
+                        //Getting a list of all registered clients 
+                        //to check the login is not registered already.
+                        ObservableList<Client> clients = FXCollections.observableList(
+                                CLIENT_MANAGER.getAllClients(new GenericType<List<Client>>() {
+                        }));
+                        //Checking the email is not registered already...
+                        for(Client client:clients) {
+                            //Checking that the email is not null to avoid NullPointerException.
+                            if(client.getEmail() != null) {
+                                if(client.getEmail().equalsIgnoreCase(newClient.getEmail())) {
+                                    emailIsValid = false;
+                                    //Showing email is already registered error message.
+                                    lblInputError.setText("* Email is already registered.");
+                                    lblInputError.setVisible(true);
+                                    //Updating the table with the list of clients
+                                    //retrieved from database.
+                                    tableClients.setItems(clients);
+                                    tableClients.refresh();
+                                    break;
+                                }
+                            }
+                        }
+                        //If email is not already registered update the database
+                        //with the new Client.
+                        if(emailIsValid) {
+                            //Hiding login is already registered error message.
+                            lblInputError.setVisible(false);
+                            //Updating newClient in the database.
+                            CLIENT_MANAGER.edit(newClient);
+                        }
                     } else {
                         //Resetting old value if new value is not valid.
                         t.getRowValue().setEmail(t.getOldValue());
@@ -231,7 +289,6 @@ public class ClientManagementController {
         } catch (ClientErrorException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage());
         }
-
     }
 
     /**
