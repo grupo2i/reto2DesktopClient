@@ -5,17 +5,18 @@
  */
 package reto2desktopclient.view;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -162,9 +163,13 @@ public class EventManagementController {
     @FXML
     private void handleButtonRemoveEvent() {
         LOGGER.log(Level.INFO, "Removing event.");
-        Event currEvent = (Event)tblEvents.getFocusModel().getFocusedItem();
-        eventManager.remove(currEvent.getId().toString());
-        refreshData();
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to delete this Event?", ButtonType.OK);
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            Event currEvent = (Event)tblEvents.getFocusModel().getFocusedItem();
+            eventManager.remove(currEvent.getId().toString());
+            refreshData();
+        }
     }
 
     /**
