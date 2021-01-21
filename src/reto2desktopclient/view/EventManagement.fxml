@@ -27,6 +27,6 @@
             <Font size="25.0" />
          </font>
       </Text>
-      <Label fx:id="lblError" layoutX="53.0" layoutY="387.0" prefHeight="17.0" prefWidth="128.0" text="*Error Label" textFill="RED" visible="false" />
+      <Label fx:id="lblError" layoutX="49.0" layoutY="363.0" prefHeight="60.0" prefWidth="273.0" text="*Error Label" textFill="RED" visible="false" />
    </children>
 </Pane>

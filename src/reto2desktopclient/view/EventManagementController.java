@@ -32,7 +32,7 @@ import reto2desktopclient.client.EventManagerFactory;
 import reto2desktopclient.model.Event;
 
 /**
- * 
+ * TODO: Check price and date conditions for lblErrors
  * @author Martin Angulo
  */
 public class EventManagementController {
@@ -260,7 +260,16 @@ public class EventManagementController {
         @Override
 	public Float fromString(String newPrice) {
             newPrice = newPrice.replace("€", "");
-            return super.fromString(newPrice);
+            try {
+                Float number = super.fromString(newPrice);
+                lblError.setText("");
+                lblError.setVisible(false);
+                return number;
+            } catch (NumberFormatException ex) {
+                lblError.setText("* Field should be a positive number.");
+                lblError.setVisible(true);
+            }
+            return null;
         }
         
 	@Override
