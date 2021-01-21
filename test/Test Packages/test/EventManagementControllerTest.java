@@ -11,13 +11,12 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import static org.testfx.api.FxAssert.verifyThat;
 import org.testfx.framework.junit.ApplicationTest;
-import static org.testfx.matcher.base.NodeMatchers.isDisabled;
 import static org.testfx.matcher.base.NodeMatchers.isEnabled;
-import static org.testfx.matcher.base.NodeMatchers.isFocused;
+import static org.testfx.matcher.base.NodeMatchers.isInvisible;
 
 /**
  *
- * @author Matteo
+ * @author Martin Angulo
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class EventManagementControllerTest extends ApplicationTest {
@@ -33,10 +32,9 @@ public class EventManagementControllerTest extends ApplicationTest {
     }
 
     @Test
-    public void test1_InitialState() {
-        verifyThat("#btnRemove", isDisabled());
-        verifyThat("#btnAdd", isFocused());
-        verifyThat("#btnBack", isEnabled());
-
+    public void testA_InitialState() {
+        verifyThat("#lblError", isInvisible());
+        verifyThat("#btnRemove", isEnabled());
+        verifyThat("#btnAdd", isEnabled());
     }
 }

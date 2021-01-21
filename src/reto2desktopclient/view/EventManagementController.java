@@ -163,7 +163,7 @@ public class EventManagementController {
     @FXML
     private void handleButtonRemoveEvent() {
         LOGGER.log(Level.INFO, "Removing event.");
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to delete this Event?", ButtonType.OK);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to delete an Event?", ButtonType.OK);
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             Event currEvent = (Event)tblEvents.getFocusModel().getFocusedItem();
