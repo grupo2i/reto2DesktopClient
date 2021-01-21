@@ -1,24 +1,31 @@
 package reto2desktopclient.view;
 
+import java.time.LocalDate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import reto2desktopclient.model.Artist;
 
 /**
  *
@@ -28,8 +35,6 @@ public class ArtistManagementController {
 
     private static final Logger LOGGER = Logger.getLogger(LogInController.class.getName());
     private Stage stage;
-    @FXML
-    private TableView tableArtists;
     @FXML
     private Button btnUpdateArtist;
     @FXML
@@ -41,6 +46,10 @@ public class ArtistManagementController {
     @FXML
     private TextField txtEmailArtist;
     @FXML
+    private RadioButton btnE;
+    @FXML
+    private RadioButton btnD;
+    @FXML
     private TextField txtFullNameArtist;
     @FXML
     private ChoiceBox choiceBox;
@@ -50,11 +59,30 @@ public class ArtistManagementController {
     private Label lblEmailError1;
     @FXML
     private Label lblUsernameError1;
+    @FXML
+    private TableView<Artist> tbData;
+    @FXML
+    public TableColumn<Artist, String> tblLogin;
+    @FXML
+    public TableColumn<Artist, String> tbEmail;
 
-    boolean errorEmailLenght = false;
-    boolean errorEmailPattern = false;
-    boolean errorTxtUserNameArtist = false;
-    boolean errorTxtFullNameArtist = false;
+    @FXML
+    public TableColumn<Artist, String> tblName;
+    @FXML
+    public DatePicker datePicker;
+    @FXML
+    public TableColumn<Artist, String> musicGenre;
+
+    @FXML
+    public TableColumn<Artist, String> tblStatus;
+    @FXML
+    public TableColumn<Artist, LocalDate> tblLastaccess;
+    ToggleGroup group = new ToggleGroup();
+
+    boolean errorEmailLenght = true;
+    boolean errorEmailPattern = true;
+    boolean errorTxtUserNameArtist = true;
+    boolean errorTxtFullNameArtist = true;
 
     public void initStage(Parent root
     ) {
@@ -72,16 +100,18 @@ public class ArtistManagementController {
         btnDeleteArtist.setDisable(true);
         btnUpdateArtist.setDisable(true);
 
+        initializebottonGroup();
         lblNameError1.setVisible(false);
         lblEmailError1.setVisible(false);
         lblUsernameError1.setVisible(false);
         //Calls the ChoiceBox function
         initializeCheckBox();
+        initialize();
+        datePicker.setValue(LocalDate.now());
         //Shows the stage
         stage.show();
         LOGGER.log(Level.INFO, "Successfully switched to Artist window.");
     }
-
     /**
      * Check that the full name pattern is correct
      *
@@ -94,28 +124,23 @@ public class ArtistManagementController {
         //If there is any error...
         if (txtFullNameLength == 0 || txtFullNameLength > 255 || !matcherFullName.matches()) {
             if (!matcherFullName.matches()) {
-                btnAddArtist.setVisible(false);
-                errorTxtFullNameArtist = true;
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Must only contain letters", ButtonType.OK);
-                alert.showAndWait();
+                disableButtons();
+                lblNameError1.setVisible(true);
             }
             //Sets the alert message when the fiel is empty.
             if (txtFullNameLength == 0) {
-                btnAddArtist.setVisible(false);
-                errorTxtFullNameArtist = true;
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Field must not be empty", ButtonType.OK);
-                alert.showAndWait();
+                disableButtons();
+                lblNameError1.setVisible(true);
             } //Sets the alert message when the field is longer than 255 characters.
             else if (txtFullNameLength > 255) {
-                btnAddArtist.setVisible(false);
-                errorTxtFullNameArtist = true;
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Must be less than 255 characters", ButtonType.OK);
-                alert.showAndWait();
+                disableButtons();
+                lblNameError1.setVisible(true);
             }
         } else {
-            errorTxtFullNameArtist = false;
+            enableButtons();
+            lblNameError1.setVisible(false);
+
         }
-        testInputErrors();
     }
 
     /**
@@ -127,12 +152,12 @@ public class ArtistManagementController {
         Integer usLenght = txtUserNameArtist.getText().trim().length();
         //if username =0 or <255= error
         if (usLenght == 0 || usLenght > 255) {
-            errorTxtUserNameArtist = true;
+            disableButtons();
+            lblUsernameError1.setVisible(true);
         } else {
-            errorTxtUserNameArtist = false;
-
+            enableButtons();
+            lblUsernameError1.setVisible(false);
         }
-        testInputErrors();
     }
 
     /**
@@ -144,6 +169,13 @@ public class ArtistManagementController {
                 "POP", "ROCK", "REGGAE", "EDM", "TRAP", "RAP", "INDIE", "REGGAETON", new Separator(), "OTHER"));
         choiceBox.setTooltip(new Tooltip("Select the music genre"));
         choiceBox.setValue("POP");
+    }
+
+    @FXML
+    public void initializebottonGroup() {
+        btnD.setToggleGroup(group);
+        btnE.setToggleGroup(group);
+        btnE.setSelected(true);
     }
 
     /**
@@ -158,14 +190,28 @@ public class ArtistManagementController {
         Matcher matcherEmail = patternEmail.matcher(txtEmailArtist.getText());
 
         if (txtEmailLength == 0 || txtEmailLength > 255) {
-            errorEmailLenght = true;
+            disableButtons();
+            lblEmailError1.setVisible(true);
         } else if (!matcherEmail.matches()) {
-            errorEmailPattern = true;
+            disableButtons();
+            lblEmailError1.setVisible(true);
         } else {
-            errorEmailLenght = false;
-            errorEmailPattern = false;
+            enableButtons();
+            lblEmailError1.setVisible(false);
         }
-        testInputErrors();
+
+    }
+
+    public void enableButtons() {
+        btnAddArtist.setDisable(false);
+        btnDeleteArtist.setDisable(false);
+        btnUpdateArtist.setDisable(false);
+    }
+
+    public void disableButtons() {
+        btnAddArtist.setDisable(true);
+        btnDeleteArtist.setDisable(true);
+        btnUpdateArtist.setDisable(true);
     }
 
     public void setStage(Stage stage) {
@@ -175,16 +221,49 @@ public class ArtistManagementController {
     public Stage getStage() {
         return stage;
     }
-  
-    private void testInputErrors() {
-        if (errorTxtFullNameArtist || errorTxtUserNameArtist || errorEmailLenght) {
-            btnAddArtist.setDisable(false);
-            btnDeleteArtist.setDisable(false);
-            btnUpdateArtist.setDisable(false);
-        } else {
-            btnAddArtist.setDisable(true);
-            btnDeleteArtist.setDisable(true);
-            btnUpdateArtist.setDisable(true);
-        }
+
+    /**
+     *
+     */
+    public void initialize() {
+        tblLogin.setCellValueFactory(new PropertyValueFactory<>("tblLogin"));
+        tbEmail.setCellValueFactory(new PropertyValueFactory<>("tbEmail"));
+        tblName.setCellValueFactory(new PropertyValueFactory<>("tblName"));
+        tblLastaccess.setCellValueFactory(new PropertyValueFactory<>("tblLastaccess"));
+        musicGenre.setCellValueFactory(new PropertyValueFactory<>("musicGenre"));
+        tblStatus.setCellValueFactory(new PropertyValueFactory<>("tblStatus"));
+        //add your data to the table here.
+        tbData.setItems(tableModel);
     }
+
+    // add your data here from any source 
+    private ObservableList<Artist> tableModel = FXCollections.observableArrayList();
+
+    /**
+     *
+     * @param e
+     */
+    public void handle(ActionEvent e) {
+        String status;
+        if (btnE.isSelected()) {
+            status = "ENABLED";
+        } else {
+            status = "DISABLED";
+        }
+        Artist artist = new Artist(
+                txtUserNameArtist.getText(),
+                txtEmailArtist.getText(),
+                txtFullNameArtist.getText(),
+                datePicker.getValue(),
+                choiceBox.getValue().toString(),
+                status);
+
+        tableModel.add(artist);
+
+        txtFullNameArtist.clear();
+        txtUserNameArtist.clear();
+        txtEmailArtist.clear();
+
+    }
+
 }

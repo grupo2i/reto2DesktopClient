@@ -23,7 +23,7 @@ public class Reto2DesktopClient extends Application {
         controller.setStage(primaryStage);
         controller.initStage(root);
     }
-
+    
     /**
      * @param args the command line arguments
      */

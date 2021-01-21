@@ -30,6 +30,7 @@ import javafx.stage.WindowEvent;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
 import reto2desktopclient.client.ClubManagerFactory;
+import reto2desktopclient.exceptions.UnexpectedErrorException;
 import reto2desktopclient.exceptions.UserInputException;
 import reto2desktopclient.model.Club;
 import reto2desktopclient.model.UserPrivilege;
@@ -66,8 +67,6 @@ public class ClubProfileController {
     private Label lblEmail;
     @FXML
     private TextField txtEmail;
-    @FXML
-    private Label lblErrorEmail;
     @FXML
     private Label lblLocation;
     @FXML
@@ -137,7 +136,6 @@ public class ClubProfileController {
 
     private void handleWindowShowing(WindowEvent event) {
         lblErrorLogin.setVisible(false);
-        lblErrorEmail.setVisible(false);
         lblErrorName.setVisible(false);
         lblErrorLocation.setVisible(false);
         lblErrorPhoneNumber.setVisible(false);
@@ -145,6 +143,7 @@ public class ClubProfileController {
         lblErrorBiography.setVisible(false);
         btnSaveChanges.setDisable(true);
         txtEmail.setText("Aqui va el mail del club");
+        txtEmail.setDisable(true);
         txtName.requestFocus();
         txtLogin.textProperty().addListener(this::handleTextLogin);
         txtName.textProperty().addListener(this::handleTextName);
@@ -177,7 +176,7 @@ public class ClubProfileController {
 
     private void handleTextName(Observable obs) {
         Integer txtNameLength = txtName.getText().trim().length();
-        Pattern patternName = Pattern.compile("^([A-Za-z]+[ ]?)+$");
+        Pattern patternName = Pattern.compile("^([A-zÀ-ú]+[ ]?)+$");
         Matcher matcherName = patternName.matcher(txtName.getText());
 
         if (txtNameLength == 0 || txtNameLength > 255 || !matcherName.matches()) {
@@ -265,7 +264,7 @@ public class ClubProfileController {
             errorPasswordLenght = true;
             lblErrorPassword.setVisible(true);
         } else {
-            errorPasswordLenght = true;
+            errorPasswordLenght = false;
             lblErrorPassword.setVisible(false);
         }
         testLabels();
@@ -286,7 +285,7 @@ public class ClubProfileController {
             errorBiographyLenght = true;
             lblErrorBiography.setVisible(true);
         } else {
-            errorBiographyLenght = true;
+            errorBiographyLenght = false;
             lblErrorBiography.setVisible(false);
         }
         testLabels();
