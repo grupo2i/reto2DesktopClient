@@ -4,6 +4,7 @@ import java.util.ResourceBundle;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 
 /**
  * Jersey REST client generated for REST resource:ArtistFacadeREST
@@ -24,17 +25,13 @@ public class ArtistRESTClient implements ArtistManager {
     private Client client;
     //TODO: Leer la URL de un archivo de propiedades
     private static final String BASE_URI = ResourceBundle
-            .getBundle("reto2desktopclient.properties.properties").getString("BASE_URI");;
+            .getBundle("reto2desktopclient.properties.properties").getString("BASE_URI");
+
+    ;
 
     public ArtistRESTClient() {
         client = javax.ws.rs.client.ClientBuilder.newClient();
         webTarget = client.target(BASE_URI).path("entity.artist");
-    }
-
-    public <T> T getAllArtists(Class<T> responseType) throws ClientErrorException {
-        WebTarget resource = webTarget;
-        resource = resource.path("getAllArtists");
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
     public void edit(Object requestEntity) throws ClientErrorException {
@@ -51,6 +48,12 @@ public class ArtistRESTClient implements ArtistManager {
         webTarget.request(javax.ws.rs.core.MediaType.APPLICATION_XML).post(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
     }
 
+    public <T> T getAllArtists(Class<T> responseType) throws ClientErrorException {
+        WebTarget resource = webTarget;
+        resource = resource.path("getAllArtists");
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+    }
+
     public void remove(String id) throws ClientErrorException {
         webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request().delete();
     }
@@ -58,5 +61,12 @@ public class ArtistRESTClient implements ArtistManager {
     public void close() {
         client.close();
     }
+
     
+    public <T> T getAllArtists(GenericType<T> responseType) throws ClientErrorException {
+      WebTarget resource = webTarget;
+        resource = resource.path("getAllArtists");
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+      }
+
 }

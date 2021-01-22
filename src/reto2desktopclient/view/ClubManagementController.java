@@ -7,12 +7,7 @@ package reto2desktopclient.view;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.sql.Types;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -41,11 +36,9 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
-import reto2desktopclient.client.ClientManagerFactory;
 import reto2desktopclient.client.ClubManagerFactory;
 import reto2desktopclient.exceptions.UnexpectedErrorException;
 import reto2desktopclient.exceptions.UserInputException;
-import reto2desktopclient.model.Client;
 import reto2desktopclient.model.Club;
 import reto2desktopclient.model.UserPrivilege;
 import reto2desktopclient.model.UserStatus;
@@ -216,7 +209,7 @@ public class ClubManagementController {
 
     private void handleClubTableSelectionChange(ObservableValue observable,
             Object oldVaue, Object newValue) {
-        tableIsSelected=true;
+        tableIsSelected = true;
         if (newValue != null) { //A row of the table is selected.
             //Enable See Events, delete and update buttons.
             btnSeeEvents.setDisable(false);
@@ -230,15 +223,15 @@ public class ClubManagementController {
             txtPhoneNumber.setText(selectedClub.getPhoneNum());
             txtStatus.setText(selectedClub.getUserStatus().toString());
             btnAdd.setDisable(true);
-            tableIsSelected=true;
+            tableIsSelected = true;
         } else { //There isn't any row selected.
             //Disable all buttons.
             btnSeeEvents.setDisable(true);
             btnDelete.setDisable(true);
             btnUpdate.setDisable(true);
             btnAdd.setDisable(true);
-            resetFieldsAndLabels(); 
-            tableIsSelected=false;
+            resetFieldsAndLabels();
+            tableIsSelected = false;
         }
     }
 
@@ -445,7 +438,7 @@ public class ClubManagementController {
             clubTable.setItems(clubData);
             LOGGER.log(Level.INFO, "Club was added succesfuly");
             resetFieldsAndLabels();
-          
+
         } catch (ClientErrorException | UnexpectedErrorException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK);
             alert.showAndWait();
@@ -556,11 +549,12 @@ public class ClubManagementController {
             btnAdd.setDisable(true);
             btnUpdate.setDisable(true);
         } else {
-            btnAdd.setDisable(false); 
-            if(tableIsSelected)
-            btnUpdate.setDisable(false);
-            else
-            btnUpdate.setDisable(true);    
+            btnAdd.setDisable(false);
+            if (tableIsSelected) {
+                btnUpdate.setDisable(false);
+            } else {
+                btnUpdate.setDisable(true);
+            }
         }
     }
 

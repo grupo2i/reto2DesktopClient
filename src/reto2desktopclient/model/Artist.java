@@ -3,6 +3,7 @@ package reto2desktopclient.model;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Set;
+import javafx.beans.property.SimpleStringProperty;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -16,75 +17,35 @@ public class Artist extends User implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Set<SocialNetwork> socialNetworks;
-    private String musicGenre;
+    private SimpleStringProperty musicGenre;
     private Set<Event> events;
-    private String tblLogin;
-    private String tbEmail;
-    private String tblName;
+    private SimpleStringProperty tblLogin;
+    private SimpleStringProperty tbEmail;
+    private SimpleStringProperty tblName;
     private LocalDate tblLastaccess;
-    private String tblStatus;
+    private SimpleStringProperty tblStatus;
 
-    /**
-     *
-     * @param tblLogin
-     * @param tbEmail
-     * @param tblName
-     * @param tblLastaccess
-     * @param musicGenre
-     * @param tblStatus
-     */
-    public Artist(String tblLogin, 
+    public Artist(String tblLogin,
             String tbEmail,
             String tblName,
             LocalDate tblLastaccess,
             String musicGenre,
             String tblStatus) {
-        this.tblLogin = tblLogin;
-        this.tbEmail = tbEmail;
-        this.tblName = tblName;
+        this.tblLogin = new SimpleStringProperty(tblLogin);
+        this.tbEmail = new SimpleStringProperty(tbEmail);
+        this.tblName = new SimpleStringProperty(tblName);
         this.tblLastaccess = tblLastaccess;
-        this.musicGenre = musicGenre;
-        this.tblStatus = tblStatus;
+        this.musicGenre = new SimpleStringProperty(musicGenre);
+        this.tblStatus = new SimpleStringProperty(tblStatus);
     }
 
-    /**
-     *
-     * @return
-     */
-    public String getTblLogin() {
-        return tblLogin;
-    }
-
-    /**
-     *
-     * @param tblLogin
-     */
-    public void setTblLogin(String tblLogin) {
-        this.tblLogin = tblLogin;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public String getTbEmail() {
-        return tbEmail;
-    }
-
-    /**
-     *
-     * @param tbEmail
-     */
-    public void setTbEmail(String tbEmail) {
-        this.tbEmail = tbEmail;
-    }
-
-    public String getTblName() {
-        return tblName;
-    }
-
-    public void setTblName(String tblName) {
-        this.tblName = tblName;
+    public Artist() {
+        this.tblLogin = new SimpleStringProperty();
+        this.tbEmail = new SimpleStringProperty();
+        this.tblName = new SimpleStringProperty();
+        this.tblLastaccess = tblLastaccess;
+        this.musicGenre = new SimpleStringProperty();
+        this.tblStatus = new SimpleStringProperty();
     }
 
     public LocalDate getTblLastaccess() {
@@ -95,15 +56,35 @@ public class Artist extends User implements Serializable {
         this.tblLastaccess = tblLastaccess;
     }
 
-    public String getTblStatus() {
+    public SimpleStringProperty getTblLogin() {
+        return tblLogin;
+    }
+
+    public void setTblLogin(SimpleStringProperty tblLogin) {
+        this.tblLogin = tblLogin;
+    }
+
+    public SimpleStringProperty getTbEmail() {
+        return tbEmail;
+    }
+
+    public void setTbEmail(SimpleStringProperty tbEmail) {
+        this.tbEmail = tbEmail;
+    }
+
+    public SimpleStringProperty getTblName() {
+        return tblName;
+    }
+
+    public void setTblName(SimpleStringProperty tblName) {
+        this.tblName = tblName;
+    }
+
+    public SimpleStringProperty getTblStatus() {
         return tblStatus;
     }
 
-    /**
-     *
-     * @param tblStatus
-     */
-    public void setTblStatus(String tblStatus) {
+    public void setTblStatus(SimpleStringProperty tblStatus) {
         this.tblStatus = tblStatus;
     }
 
@@ -129,10 +110,6 @@ public class Artist extends User implements Serializable {
         this.socialNetworks = socialNetworks;
     }
 
-    public void setEvents(Set<Event> events) {
-        this.events = events;
-    }
-
     /**
      *
      * @return
@@ -142,18 +119,24 @@ public class Artist extends User implements Serializable {
     }
 
     /**
-     *
-     * @return
+     * @return the events
      */
     public Set<Event> getEvents() {
         return events;
     }
 
     /**
+     * @param events the events to set
+     */
+    public void setEvents(Set<Event> events) {
+        this.events = events;
+    }
+
+    /**
      *
      * @return
      */
-    public String getMusicGenre() {
+    public SimpleStringProperty getMusicGenre() {
         return musicGenre;
     }
 
