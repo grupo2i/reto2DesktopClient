@@ -102,7 +102,7 @@ public class EventManagementController {
         
         colName.setCellFactory(TextFieldTableCell.forTableColumn());
         //Pass Date to String converter
-        colDate.setCellFactory(TextFieldTableCell.forTableColumn(new MyDateStringConverter("MM/dd/yy")));       
+        colDate.setCellFactory(TextFieldTableCell.forTableColumn(new MyDateStringConverter("dd/MM/yy")));       
         colPlace.setCellFactory(TextFieldTableCell.forTableColumn());
         //Pass Float to String converter
         colPrice.setCellFactory(TextFieldTableCell.forTableColumn(new MyFloatStringConverter()));
@@ -118,7 +118,7 @@ public class EventManagementController {
         });
         colDate.setOnEditCommit((CellEditEvent<Event, Date> t) -> {
             if(t.getNewValue() == null && 
-                !lblError.getText().equals("* Date must have format: mm/dd/yy\nand be possible.")) {
+                !lblError.getText().equals("* Date must have format: dd/mm/yy\nand be possible.")) {
                 lblError.setText("* Field must not be empty.");
                 lblError.setVisible(true);
             } else {
@@ -210,11 +210,11 @@ public class EventManagementController {
     
     private Boolean validateLength(String s) {
         if (s.length() == 0) {
-            lblError.setText("* Field must not be empty");
+            lblError.setText("* Field must not be empty.");
             lblError.setVisible(true);
             return false;
         } else if (s.length() > 255){
-            lblError.setText("* Must be less than 255 characters");
+            lblError.setText("* Must be less than 255 characters.");
             lblError.setVisible(true);
             return false;
         }
@@ -228,7 +228,7 @@ public class EventManagementController {
             lblError.setVisible(true);
             return false;
         } else if(price < 0) {
-            lblError.setText("* Price cannot be negative");
+            lblError.setText("* Field should be a positive number.");
             lblError.setVisible(true);
             return false;
         }
@@ -254,7 +254,7 @@ public class EventManagementController {
                     lblError.setText("* Field must not be empty.");
                     lblError.setVisible(true);
                 } else {
-                    lblError.setText("* Date must have format: mm/dd/yy\nand be possible.");
+                    lblError.setText("* Date must have format: dd/mm/yy\nand be possible.");
                     lblError.setVisible(true);
                 }
                 return null;
