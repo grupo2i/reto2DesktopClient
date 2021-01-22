@@ -72,7 +72,7 @@
                                      text="Email" />
                         <TableColumn fx:id="tblName" prefWidth="85.0" text="Full name" />
                         <TableColumn fx:id="tblLastaccess" prefWidth="79.0" text="Last Access" />
-                        <TableColumn fx:id="musicGenre" prefWidth="104.0" text="Music Genre" />
+                        <TableColumn fx:id="musicGenre" prefWidth="104.0" text="musicGenre" />
                         <TableColumn fx:id="tblStatus" prefWidth="97.0" text="Status" />
                     </columns>
                 </TableView>

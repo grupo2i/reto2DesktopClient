@@ -36,12 +36,9 @@ import javafx.stage.Stage;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
 import reto2desktopclient.client.ArtistManagerFactory;
-import reto2desktopclient.client.ClubManagerFactory;
 import reto2desktopclient.exceptions.UnexpectedErrorException;
 import reto2desktopclient.exceptions.UserInputException;
 import reto2desktopclient.model.Artist;
-import reto2desktopclient.model.Club;
-import reto2desktopclient.model.UserStatus;
 
 /**
  *
@@ -107,16 +104,6 @@ public class ArtistManagementController {
 
     /**
      *
-     * @return
-     */
-    public static final LocalDate NOW_LOCAL_DATE() {
-        String date = new SimpleDateFormat("dd-MM-yyyy").format(Calendar.getInstance().getTime());
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        LocalDate localDate = LocalDate.parse(date, formatter);
-        return localDate;
-    }
-
-    /**
      *
      * @param root
      */
@@ -142,12 +129,12 @@ public class ArtistManagementController {
         txtUserNameArtist.textProperty().addListener(this::handletxtUserNameArtist);
 
         //Stablishing cell value factories on table columns
-        tblLogin.setCellValueFactory(new PropertyValueFactory<>("tblLogin"));
-        tbEmail.setCellValueFactory(new PropertyValueFactory<>("tbEmail"));
-        tblName.setCellValueFactory(new PropertyValueFactory<>("tblName"));
+        tblLogin.setCellValueFactory(new PropertyValueFactory<>("login"));
+        tbEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+        tblName.setCellValueFactory(new PropertyValueFactory<>("fullName"));
         tblLastaccess.setCellValueFactory(new PropertyValueFactory<>("lastAccess"));
-        musicGenre.setCellValueFactory(new PropertyValueFactory<>("musicGenre"));
-        tblStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        musicGenre.setCellValueFactory(new PropertyValueFactory<>("MusicGenre"));
+        tblStatus.setCellValueFactory(new PropertyValueFactory<>("userStatus"));
         //Creating an Artist observable List with all registered artist.
         artistData = FXCollections.observableList(ArtistManagerFactory
                 .getArtistManager().getAllArtists(new GenericType<List<Artist>>() {
@@ -161,6 +148,11 @@ public class ArtistManagementController {
         Logger.getLogger(LogInController.class.getName()).log(Level.INFO, "Showing stage...");
     }
 
+    /**
+     *
+     * @param event
+     * @throws UserInputException
+     */
     @FXML
     public void handleButtonDelete(ActionEvent event) throws UserInputException {
         try {
@@ -193,6 +185,11 @@ public class ArtistManagementController {
         }
     }
 
+    /**
+     *
+     * @param event
+     * @throws UserInputException
+     */
     @FXML
     public void handleButtonUpdate(ActionEvent event) throws UserInputException {
         Artist selectedArtist = ((Artist) tableArtist.getSelectionModel().getSelectedItem());
@@ -232,8 +229,8 @@ public class ArtistManagementController {
             txtEmailArtist.setText(selectedArtist.getEmail());
             txtFullNameArtist.setText(selectedArtist.getFullName());
             txtUserNameArtist.setText(selectedArtist.getLogin());
-            choiceBox.setValue(selectedArtist.getMusicGenre().getValue());
-            group.setUserData(selectedArtist.getTblStatus());
+            choiceBox.setValue(selectedArtist.getMusicGenre());
+            group.setUserData(selectedArtist.getUserStatus());
             tableIsSelected = true;
         } else { //There isn't any row selected.
             //Disable all buttons.
@@ -363,6 +360,7 @@ public class ArtistManagementController {
         Artist artist = new Artist();
         artist.setFullName(txtFullNameArtist.getText());
         artist.setEmail(txtEmailArtist.getText());
+        artist.setLogin(txtUserNameArtist.getText());
         ArtistManagerFactory.getArtistManager().create(artist);
         artistData = FXCollections.observableList(ArtistManagerFactory
                 .getArtistManager().getAllArtists(new GenericType<List<Artist>>() {
