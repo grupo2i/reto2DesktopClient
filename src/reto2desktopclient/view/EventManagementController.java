@@ -16,6 +16,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -64,6 +65,9 @@ public class EventManagementController {
     @FXML
     private Label lblError;
     
+    @FXML
+    private Button btnAddEvent;
+    
     private String userLogin;
     
     /**
@@ -81,6 +85,9 @@ public class EventManagementController {
         
         //Hide label
         lblError.setVisible(false);
+        
+        //Focus add event button
+        btnAddEvent.requestFocus();
         
         //Make the table editable
         tblEvents.setEditable(true);
