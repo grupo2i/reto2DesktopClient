@@ -31,7 +31,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -125,6 +127,12 @@ public class ClubManagementController {
     private Label lblErrorStatus;
     @FXML
     private AdminMenuController adminMenuController;
+    @FXML
+    private ContextMenu clubContextMenu;
+    @FXML
+    private MenuItem menuItemSeeEvents;
+    @FXML
+    private MenuItem menuItemDeleteClub;
 
     private ObservableList clubData;
 
@@ -216,7 +224,7 @@ public class ClubManagementController {
 
     private void handleClubTableSelectionChange(ObservableValue observable,
             Object oldVaue, Object newValue) {
-        tableIsSelected=true;
+        tableIsSelected = true;
         if (newValue != null) { //A row of the table is selected.
             //Enable See Events, delete and update buttons.
             btnSeeEvents.setDisable(false);
@@ -230,15 +238,15 @@ public class ClubManagementController {
             txtPhoneNumber.setText(selectedClub.getPhoneNum());
             txtStatus.setText(selectedClub.getUserStatus().toString());
             btnAdd.setDisable(true);
-            tableIsSelected=true;
+            tableIsSelected = true;
         } else { //There isn't any row selected.
             //Disable all buttons.
             btnSeeEvents.setDisable(true);
             btnDelete.setDisable(true);
             btnUpdate.setDisable(true);
             btnAdd.setDisable(true);
-            resetFieldsAndLabels(); 
-            tableIsSelected=false;
+            resetFieldsAndLabels();
+            tableIsSelected = false;
         }
     }
 
@@ -399,12 +407,11 @@ public class ClubManagementController {
 
     @FXML
     public void handleButtonAdd(ActionEvent event) throws UserInputException {
-        Integer encontradoUsername = 0;
-        Integer encontradoMail = 0;
-
         try {
-            usernameExists = findLogin();
             Club club = new Club();
+            usernameExists = true;
+            usernameExists = true;
+            findUserAndEmail();
             if (usernameExists) {
                 LOGGER.log(Level.SEVERE, "Login username already in use");
                 Alert alert = new Alert(Alert.AlertType.WARNING, "Login username already exists", ButtonType.OK);
@@ -416,7 +423,6 @@ public class ClubManagementController {
                 btnAdd.setDisable(false);
                 btnUpdate.setDisable(false);
             }
-            emailExists = findEmail();
             if (emailExists) {
                 LOGGER.log(Level.SEVERE, "Email already in use");
                 Alert alert = new Alert(Alert.AlertType.WARNING, "Email already exists", ButtonType.OK);
@@ -428,24 +434,26 @@ public class ClubManagementController {
                 btnAdd.setDisable(false);
                 btnUpdate.setDisable(false);
             }
-            String password = "defaultPassword";
-            String encodedPassword = PublicCrypt.encode(password);
-            club.setPassword(encodedPassword);
-            club.setUserPrivilege(UserPrivilege.CLUB);
-            club.setFullName(txtName.getText());
-            club.setLocation(txtLocation.getText());
-            club.setPhoneNum(txtPhoneNumber.getText());
-            club.setUserStatus(UserStatus.valueOf(txtStatus.getText().toUpperCase()));
-            club.setLastPasswordChange(Timestamp.valueOf(LocalDateTime.now()));
-            club.setProfileImage("user.png");
-            ClubManagerFactory.getClubManager().create(club);
-            clubData = FXCollections.observableList(ClubManagerFactory
-                    .getClubManager().getAllClubs(new GenericType<List<Club>>() {
-                    }));
-            clubTable.setItems(clubData);
-            LOGGER.log(Level.INFO, "Club was added succesfuly");
-            resetFieldsAndLabels();
-          
+            if (!emailExists && !usernameExists) {
+                String password = "defaultPassword";
+                String encodedPassword = PublicCrypt.encode(password);
+                club.setPassword(encodedPassword);
+                club.setUserPrivilege(UserPrivilege.CLUB);
+                club.setFullName(txtName.getText());
+                club.setLocation(txtLocation.getText());
+                club.setPhoneNum(txtPhoneNumber.getText());
+                club.setUserStatus(UserStatus.valueOf(txtStatus.getText().toUpperCase()));
+                club.setLastPasswordChange(Timestamp.valueOf(LocalDateTime.now()));
+                club.setProfileImage("user.png");
+                ClubManagerFactory.getClubManager().create(club);
+                clubData = FXCollections.observableList(ClubManagerFactory
+                        .getClubManager().getAllClubs(new GenericType<List<Club>>() {
+                        }));
+                clubTable.setItems(clubData);
+                LOGGER.log(Level.INFO, "Club was added succesfuly");
+                resetFieldsAndLabels();
+                clubTable.refresh();
+            }
         } catch (ClientErrorException | UnexpectedErrorException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK);
             alert.showAndWait();
@@ -497,7 +505,7 @@ public class ClubManagementController {
         usernameExists = false;
         emailExists = false;
         if (!selectedClub.getLogin().equals(txtLogin.getText())) {
-            usernameExists = findLogin();
+            findLogin();
         }
         if (usernameExists) {
             LOGGER.log(Level.SEVERE, "Login username already in use");
@@ -511,7 +519,7 @@ public class ClubManagementController {
             btnUpdate.setDisable(false);
         }
         if (!selectedClub.getEmail().equals(txtEmail.getText())) {
-            emailExists = findEmail();
+            findEmail();
         }
         if (emailExists) {
             LOGGER.log(Level.SEVERE, "Email already in use");
@@ -552,15 +560,17 @@ public class ClubManagementController {
 
     private void testLabels() {
         if (errorStatusPattern || errorStatusPattern || errorNameLenght || errorNamePattern || errorEmailPattern
-                || errorEmailLenght || errorLocationLenght || errorPhoneNumberLenght || errorPhoneNumberPattern) {
+                || errorEmailLenght || errorLocationLenght || errorPhoneNumberLenght || errorPhoneNumberPattern
+                || lblErrorEmail.isVisible() || lblErrorLogin.isVisible()) {
             btnAdd.setDisable(true);
             btnUpdate.setDisable(true);
         } else {
-            btnAdd.setDisable(false); 
-            if(tableIsSelected)
-            btnUpdate.setDisable(false);
-            else
-            btnUpdate.setDisable(true);    
+            btnAdd.setDisable(false);
+            if (tableIsSelected) {
+                btnUpdate.setDisable(false);
+            } else {
+                btnUpdate.setDisable(true);
+            }
         }
     }
 
@@ -583,9 +593,8 @@ public class ClubManagementController {
         List<Club> clubfind = ClubManagerFactory.getClubManager()
                 .getAllClubs(new GenericType<List<Club>>() {
                 });
-
         for (int x = 0; x < clubfind.size(); x++) {
-            if (clubfind.get(x).getLogin().equals(txtLogin.getText())) {
+            if (clubfind.get(x).getLogin().equalsIgnoreCase(txtLogin.getText().trim())) {
                 usernameExists = true;
                 break;
             } else {
@@ -600,7 +609,7 @@ public class ClubManagementController {
                 .getAllClubs(new GenericType<List<Club>>() {
                 });
         for (int x = 0; x < clubfindmail.size(); x++) {
-            if (clubfindmail.get(x).getEmail().equals(txtEmail.getText())) {
+            if (clubfindmail.get(x).getEmail().equals(txtEmail.getText().trim())) {
                 emailExists = true;
                 break;
             } else {
@@ -609,4 +618,27 @@ public class ClubManagementController {
         }
         return emailExists;
     }
+
+    private void findUserAndEmail() {
+        List<Club> find = ClubManagerFactory.getClubManager()
+                .getAllClubs(new GenericType<List<Club>>() {
+                });
+        for (int x = 0; x < find.size(); x++) {
+            if (find.get(x).getLogin().equals(txtLogin.getText().trim())) {
+                usernameExists = true;
+                break;
+            } else {
+                usernameExists = false;
+            }
+        }
+        for (int x = 0; x < find.size(); x++) {
+            if (find.get(x).getEmail().equals(txtEmail.getText().trim())) {
+                emailExists = true;
+                break;
+            } else {
+                emailExists = false;
+            }
+        }
+    }
+
 }
