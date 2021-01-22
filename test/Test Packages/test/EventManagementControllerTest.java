@@ -9,11 +9,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
-import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import org.junit.BeforeClass;
@@ -23,6 +21,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import static org.testfx.api.FxAssert.verifyThat;
 import org.testfx.framework.junit.ApplicationTest;
+import org.testfx.matcher.base.NodeMatchers;
 import static org.testfx.matcher.base.NodeMatchers.isEnabled;
 import static org.testfx.matcher.base.NodeMatchers.isInvisible;
 import static org.testfx.matcher.base.NodeMatchers.isVisible;
@@ -40,7 +39,7 @@ public class EventManagementControllerTest extends ApplicationTest {
     /** String of size MAX_TEXT_LENGTH + 1 for testing. */
     private static String longString = "";
     
-    private static final int colsSize = 5;
+    private static final int colCount = 5;
     enum colPos { colName, colDate, colPlace, colPrice, colDescription }
     
     /**
@@ -106,19 +105,19 @@ public class EventManagementControllerTest extends ApplicationTest {
     @Test
     public void testD_ModifyEvent() {
         int lastRow = lookup("#tblEvents").queryTableView().getItems().size() - 1;
-        Node col = lookup(".table-cell").nth(colPos.colName.ordinal() + (lastRow * colsSize)).query();
+        Node col = lookup(".table-cell").nth(colPos.colName.ordinal() + (lastRow * colCount)).query();
         doubleClickOn(col);
         write("Name");
         push(KeyCode.ENTER);
-        col = lookup(".table-cell").nth(colPos.colDate.ordinal() + (lastRow * colsSize)).query();
+        col = lookup(".table-cell").nth(colPos.colDate.ordinal() + (lastRow * colCount)).query();
         doubleClickOn(col);
         write("12/15/12");
         push(KeyCode.ENTER);
-        col = lookup(".table-cell").nth(colPos.colPlace.ordinal() + (lastRow * colsSize)).query();
+        col = lookup(".table-cell").nth(colPos.colPlace.ordinal() + (lastRow * colCount)).query();
         doubleClickOn(col);
         write("Place");
         push(KeyCode.ENTER);
-        col = lookup(".table-cell").nth(colPos.colPrice.ordinal() + (lastRow * colsSize)).query();
+        col = lookup(".table-cell").nth(colPos.colPrice.ordinal() + (lastRow * colCount)).query();
         doubleClickOn(col);
         write("100");
         push(KeyCode.ENTER);
@@ -132,7 +131,7 @@ public class EventManagementControllerTest extends ApplicationTest {
     public void testE_ModifyEventName() {
         int lastRow = lookup("#tblEvents").queryTableView().getItems().size() - 1;
         TableView tblEvents = lookup("#tblEvents").queryTableView();
-        Node col = lookup(".table-cell").nth(colPos.colName.ordinal() + (lastRow * colsSize)).query();
+        Node col = lookup(".table-cell").nth(colPos.colName.ordinal() + (lastRow * colCount)).query();
         String preEdit = ((Event)tblEvents.getItems().get(0)).getName();
         doubleClickOn(col);
         write("anyname");
@@ -145,7 +144,7 @@ public class EventManagementControllerTest extends ApplicationTest {
     public void testF_ModifyEventDate() {
         int lastRow = lookup("#tblEvents").queryTableView().getItems().size() - 1;
         TableView tblEvents = lookup("#tblEvents").queryTableView();
-        Node col = lookup(".table-cell").nth(colPos.colDate.ordinal() + (lastRow * colsSize)).query();
+        Node col = lookup(".table-cell").nth(colPos.colDate.ordinal() + (lastRow * colCount)).query();
         String preEdit = ((Event)tblEvents.getItems().get(0)).getDate().toString();
         doubleClickOn(col);
         write("12/12/12");
@@ -158,7 +157,7 @@ public class EventManagementControllerTest extends ApplicationTest {
     public void testG_ModifyEventPlace() {
         int lastRow = lookup("#tblEvents").queryTableView().getItems().size() - 1;
         TableView tblEvents = lookup("#tblEvents").queryTableView();
-        Node col = lookup(".table-cell").nth(colPos.colPlace.ordinal() + (lastRow * colsSize)).query();
+        Node col = lookup(".table-cell").nth(colPos.colPlace.ordinal() + (lastRow * colCount)).query();
         String preEdit = ((Event)tblEvents.getItems().get(0)).getPlace();
         doubleClickOn(col);
         write("anyplace");
@@ -171,7 +170,7 @@ public class EventManagementControllerTest extends ApplicationTest {
     public void testH_ModifyEventPrice() {
         int lastRow = lookup("#tblEvents").queryTableView().getItems().size() - 1;
         TableView tblEvents = lookup("#tblEvents").queryTableView();
-        Node col = lookup(".table-cell").nth(colPos.colPrice.ordinal() + (lastRow * colsSize)).query();
+        Node col = lookup(".table-cell").nth(colPos.colPrice.ordinal() + (lastRow * colCount)).query();
         String preEdit = ((Event)tblEvents.getItems().get(0)).getTicketprice().toString();
         doubleClickOn(col);
         write("5");
@@ -184,7 +183,7 @@ public class EventManagementControllerTest extends ApplicationTest {
     public void testI_ModifyEventDescription() {
         int lastRow = lookup("#tblEvents").queryTableView().getItems().size() - 1;
         TableView tblEvents = lookup("#tblEvents").queryTableView();
-        Node col = lookup(".table-cell").nth(colPos.colDescription.ordinal() + (lastRow * colsSize)).query();
+        Node col = lookup(".table-cell").nth(colPos.colDescription.ordinal() + (lastRow * colCount)).query();
         String preEdit = ((Event)tblEvents.getItems().get(0)).getDescription();
         doubleClickOn(col);
         write("anydescription");
@@ -198,7 +197,7 @@ public class EventManagementControllerTest extends ApplicationTest {
         String emptyError = "* Field must not be empty";
         int lastRow = lookup("#tblEvents").queryTableView().getItems().size() - 1;
         //Name
-        Node col = lookup(".table-cell").nth(colPos.colName.ordinal() + (lastRow * colsSize)).query();
+        Node col = lookup(".table-cell").nth(colPos.colName.ordinal() + (lastRow * colCount)).query();
         doubleClickOn(col);
         write("a");
         push(KeyCode.BACK_SPACE);
@@ -206,7 +205,7 @@ public class EventManagementControllerTest extends ApplicationTest {
         verifyThat("#lblError", isVisible());
         verifyThat(emptyError, isVisible());
         //Date
-        col = lookup(".table-cell").nth(colPos.colDate.ordinal() + (lastRow * colsSize)).query();
+        col = lookup(".table-cell").nth(colPos.colDate.ordinal() + (lastRow * colCount)).query();
         doubleClickOn(col);
         write("a");
         push(KeyCode.BACK_SPACE);
@@ -214,7 +213,7 @@ public class EventManagementControllerTest extends ApplicationTest {
         verifyThat("#lblError", isVisible());
         verifyThat(emptyError, isVisible());
         //Place
-        col = lookup(".table-cell").nth(colPos.colPlace.ordinal() + (lastRow * colsSize)).query();
+        col = lookup(".table-cell").nth(colPos.colPlace.ordinal() + (lastRow * colCount)).query();
         doubleClickOn(col);
         write("a");
         push(KeyCode.BACK_SPACE);
@@ -222,7 +221,7 @@ public class EventManagementControllerTest extends ApplicationTest {
         verifyThat("#lblError", isVisible());
         verifyThat(emptyError, isVisible());
         //Price
-        col = lookup(".table-cell").nth(colPos.colPrice.ordinal() + (lastRow * colsSize)).query();
+        col = lookup(".table-cell").nth(colPos.colPrice.ordinal() + (lastRow * colCount)).query();
         doubleClickOn(col);
         write("a");
         push(KeyCode.BACK_SPACE);
@@ -230,7 +229,7 @@ public class EventManagementControllerTest extends ApplicationTest {
         verifyThat("#lblError", isVisible());
         verifyThat(emptyError, isVisible());
         //Description
-        col = lookup(".table-cell").nth(colPos.colDescription.ordinal() + (lastRow * colsSize)).query();
+        col = lookup(".table-cell").nth(colPos.colDescription.ordinal() + (lastRow * colCount)).query();
         doubleClickOn(col);
         write("a");
         push(KeyCode.BACK_SPACE);
@@ -245,21 +244,21 @@ public class EventManagementControllerTest extends ApplicationTest {
         String maxLengthError = "* Must be less than 255 characters";
         int lastRow = lookup("#tblEvents").queryTableView().getItems().size() - 1;
         //Name
-        Node col = lookup(".table-cell").nth(colPos.colName.ordinal() + (lastRow * colsSize)).query();
+        Node col = lookup(".table-cell").nth(colPos.colName.ordinal() + (lastRow * colCount)).query();
         doubleClickOn(col);
         write(longString);
         push(KeyCode.ENTER);
         verifyThat("#lblError", isVisible());
         verifyThat(maxLengthError, isVisible());
         //Place
-        col = lookup(".table-cell").nth(colPos.colPlace.ordinal() + (lastRow * colsSize)).query();
+        col = lookup(".table-cell").nth(colPos.colPlace.ordinal() + (lastRow * colCount)).query();
         doubleClickOn(col);
         write(longString);
         push(KeyCode.ENTER);
         verifyThat("#lblError", isVisible());
         verifyThat(maxLengthError, isVisible());
         //Description
-        col = lookup(".table-cell").nth(colPos.colDescription.ordinal() + (lastRow * colsSize)).query();
+        col = lookup(".table-cell").nth(colPos.colDescription.ordinal() + (lastRow * colCount)).query();
         doubleClickOn(col);
         write(longString);
         push(KeyCode.ENTER);
@@ -280,8 +279,13 @@ public class EventManagementControllerTest extends ApplicationTest {
     @Test
     public void testN_RemoveEvent() {
         //Verify the alert too
+        int rowCount = lookup("#tblEvents").queryTableView().getItems().size();
+        Node row = lookup(".table-row-cell").nth(rowCount - 1).query();
+        clickOn(row);
+        clickOn("#btnRemoveEvent");
         verifyThat("Are you sure you want to delete an Event?", NodeMatchers.isVisible());
         clickOn("OK");
+        assertNotEquals(rowCount, lookup("#tblEvents").queryTableView().getItems().size());
     }
     
     @Test
