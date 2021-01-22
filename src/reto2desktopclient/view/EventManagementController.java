@@ -5,6 +5,8 @@
  */
 package reto2desktopclient.view;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +36,7 @@ import reto2desktopclient.model.Event;
 
 /**
  * TODO: Check price and date conditions for lblErrors
+ * Don't save long strings.
  * @author Martin Angulo
  */
 public class EventManagementController {
@@ -114,17 +117,24 @@ public class EventManagementController {
                 currEvent.setName(t.getNewValue());
                 eventManager.edit(currEvent);
                 tblEvents.refresh();
+            } else {
+                Event currEvent = t.getRowValue();
+                currEvent.setName(t.getOldValue());
+                tblEvents.refresh();
             }
         });
         colDate.setOnEditCommit((CellEditEvent<Event, Date> t) -> {
-            if(t.getNewValue() == null && 
-                !lblError.getText().equals("* Date must have format: dd/mm/yy\nand be possible.")) {
-                lblError.setText("* Field must not be empty.");
-                lblError.setVisible(true);
-            } else {
+            if(t.getNewValue() != null) {
                 Event currEvent = t.getRowValue();
                 currEvent.setDate(t.getNewValue());
                 eventManager.edit(currEvent);
+                tblEvents.refresh();
+            } else if(t.getNewValue() == null && 
+                !lblError.getText().equals("* Date must have format: dd/mm/yy\nand be possible.")) {
+                lblError.setText("* Field must not be empty.");
+                lblError.setVisible(true);
+                Event currEvent = t.getRowValue();
+                currEvent.setDate(t.getOldValue());
                 tblEvents.refresh();
             }
         });
@@ -134,18 +144,24 @@ public class EventManagementController {
                 currEvent.setPlace(t.getNewValue());
                 eventManager.edit(currEvent);
                 tblEvents.refresh();
+            } else {
+                Event currEvent = t.getRowValue();
+                currEvent.setName(t.getOldValue());
+                tblEvents.refresh();
             }
         });
         colPrice.setOnEditCommit((CellEditEvent<Event, Float> t) -> {
-            if(validatePrice(t.getNewValue()) && validateLength(t.getNewValue().toString())) {
+            if(t.getNewValue() != null && validatePrice(t.getNewValue())) {
                 Event currEvent = t.getRowValue();
                 currEvent.setTicketprice(t.getNewValue());
                 eventManager.edit(currEvent);
                 tblEvents.refresh();
-            } else {
+            } else if(t.getNewValue() == null && 
+                !lblError.getText().equals("* Field should be a positive number.")) {
+                lblError.setText("* Field must not be empty.");
+                lblError.setVisible(true);
                 Event currEvent = t.getRowValue();
-                currEvent.setTicketprice(null);
-                eventManager.edit(currEvent);
+                currEvent.setTicketprice(t.getOldValue());
                 tblEvents.refresh();
             }
         });
@@ -154,6 +170,10 @@ public class EventManagementController {
                 Event currEvent = t.getRowValue();
                 currEvent.setDescription(t.getNewValue());
                 eventManager.edit(currEvent);
+                tblEvents.refresh();
+            } else {
+                Event currEvent = t.getRowValue();
+                currEvent.setName(t.getOldValue());
                 tblEvents.refresh();
             }
         });
@@ -169,11 +189,11 @@ public class EventManagementController {
      */
     @FXML
     private void handleButtonRemoveEvent() {
-        LOGGER.log(Level.INFO, "Removing event.");
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to delete an Event?", ButtonType.OK);
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             Event currEvent = (Event)tblEvents.getFocusModel().getFocusedItem();
+            LOGGER.log(Level.INFO, "Removing event with id: {0}", currEvent.getId());
             eventManager.remove(currEvent.getId().toString());
             refreshData();
         }
@@ -188,10 +208,6 @@ public class EventManagementController {
         Event newEvent = new Event();
         eventManager.create(newEvent);
         refreshData();
-        tblEvents.getSelectionModel().clearSelection();
-        tblEvents.getSelectionModel().select(tblEvents.getItems().size() - 1, colName);
-        tblEvents.scrollTo(newEvent);
-        tblEvents.edit(tblEvents.getItems().size() - 1, colName);
         tblEvents.refresh();
     }
 
@@ -205,6 +221,8 @@ public class EventManagementController {
     
     private void refreshData() {
         eventData = FXCollections.observableArrayList(eventManager.getAllEvents(new GenericType<List<Event>>(){}));
+        Comparator<Event> byIdDescending = (Event e1, Event e2)->e2.getId().compareTo(e1.getId());
+        Collections.sort(eventData, byIdDescending);
         tblEvents.setItems(eventData);
     }
     
@@ -223,11 +241,7 @@ public class EventManagementController {
     }
     
     private Boolean validatePrice(Float price) {
-        if(price == null) {
-            lblError.setText("* Field must not be empty.");
-            lblError.setVisible(true);
-            return false;
-        } else if(price < 0) {
+        if(price < 0) {
             lblError.setText("* Field should be a positive number.");
             lblError.setVisible(true);
             return false;
@@ -267,14 +281,19 @@ public class EventManagementController {
         @Override
 	public Float fromString(String newPrice) {
             newPrice = newPrice.replace("€", "");
-            try {
+            try {                
                 Float number = super.fromString(newPrice);
                 lblError.setText("");
                 lblError.setVisible(false);
                 return number;
             } catch (NumberFormatException ex) {
-                lblError.setText("* Field should be a positive number.");
-                lblError.setVisible(true);
+                if(newPrice == null) {
+                    lblError.setText("* Field must not be empty.");
+                    lblError.setVisible(true);
+                } else {
+                    lblError.setText("* Field should be a positive number.");
+                    lblError.setVisible(true);
+                }
             }
             return null;
         }
