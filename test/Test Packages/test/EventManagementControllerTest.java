@@ -198,6 +198,11 @@ public class EventManagementControllerTest extends ApplicationTest {
         push(KeyCode.ENTER);
         verifyThat("#lblError", isVisible());
         verifyThat(emptyError, isVisible());
+        
+        push(KeyCode.ENTER);
+        push(KeyCode.ENTER);
+        verifyThat("#lblError", isInvisible());
+        
         //Date
         col = lookup(".table-cell").nth(colPos.colDate.ordinal()).query();
         doubleClickOn(col);
@@ -206,6 +211,11 @@ public class EventManagementControllerTest extends ApplicationTest {
         push(KeyCode.ENTER);
         verifyThat("#lblError", isVisible());
         verifyThat(emptyError, isVisible());
+        
+        push(KeyCode.ENTER);
+        push(KeyCode.ENTER);
+        verifyThat("#lblError", isInvisible());
+        
         //Place
         col = lookup(".table-cell").nth(colPos.colPlace.ordinal()).query();
         doubleClickOn(col);
@@ -214,6 +224,11 @@ public class EventManagementControllerTest extends ApplicationTest {
         push(KeyCode.ENTER);
         verifyThat("#lblError", isVisible());
         verifyThat(emptyError, isVisible());
+        
+        push(KeyCode.ENTER);
+        push(KeyCode.ENTER);
+        verifyThat("#lblError", isInvisible());
+        
         //Price
         col = lookup(".table-cell").nth(colPos.colPrice.ordinal()).query();
         doubleClickOn(col);
@@ -222,6 +237,11 @@ public class EventManagementControllerTest extends ApplicationTest {
         push(KeyCode.ENTER);
         verifyThat("#lblError", isVisible());
         verifyThat(emptyError, isVisible());
+        
+        push(KeyCode.ENTER);
+        push(KeyCode.ENTER);
+        verifyThat("#lblError", isInvisible());
+        
         //Description
         col = lookup(".table-cell").nth(colPos.colDescription.ordinal()).query();
         doubleClickOn(col);
@@ -230,6 +250,10 @@ public class EventManagementControllerTest extends ApplicationTest {
         push(KeyCode.ENTER);
         verifyThat("#lblError", isVisible());
         verifyThat(emptyError, isVisible());
+        
+        push(KeyCode.ENTER);
+        push(KeyCode.ENTER);
+        verifyThat("#lblError", isInvisible());
     }
     
     @Test
@@ -242,6 +266,11 @@ public class EventManagementControllerTest extends ApplicationTest {
         push(KeyCode.ENTER);
         verifyThat("#lblError", isVisible());
         verifyThat(maxLengthError, isVisible());
+        
+        push(KeyCode.ENTER);
+        push(KeyCode.ENTER);
+        verifyThat("#lblError", isInvisible());
+        
         //Place
         col = lookup(".table-cell").nth(colPos.colPlace.ordinal()).query();
         doubleClickOn(col);
@@ -249,6 +278,11 @@ public class EventManagementControllerTest extends ApplicationTest {
         push(KeyCode.ENTER);
         verifyThat("#lblError", isVisible());
         verifyThat(maxLengthError, isVisible());
+        
+        push(KeyCode.ENTER);
+        push(KeyCode.ENTER);
+        verifyThat("#lblError", isInvisible());
+        
         //Description
         col = lookup(".table-cell").nth(colPos.colDescription.ordinal()).query();
         doubleClickOn(col);
@@ -256,6 +290,10 @@ public class EventManagementControllerTest extends ApplicationTest {
         push(KeyCode.ENTER);
         verifyThat("#lblError", isVisible());
         verifyThat(maxLengthError, isVisible());
+        
+        push(KeyCode.ENTER);
+        push(KeyCode.ENTER);
+        verifyThat("#lblError", isInvisible());
     }
     
     @Test
@@ -268,12 +306,21 @@ public class EventManagementControllerTest extends ApplicationTest {
         push(KeyCode.ENTER);
         verifyThat("#lblError", isVisible());
         verifyThat(dateFormatError, isVisible());
+        
+        push(KeyCode.ENTER);
+        push(KeyCode.ENTER);
+        verifyThat("#lblError", isInvisible());
+        
         col = lookup(".table-cell").nth(colPos.colDate.ordinal()).query();
         doubleClickOn(col);
         write("99/99/99");
         push(KeyCode.ENTER);
         verifyThat("#lblError", isVisible());
         verifyThat(dateFormatError, isVisible());
+        
+        push(KeyCode.ENTER);
+        push(KeyCode.ENTER);
+        verifyThat("#lblError", isInvisible());
     }
     
     @Test
@@ -286,12 +333,21 @@ public class EventManagementControllerTest extends ApplicationTest {
         push(KeyCode.ENTER);
         verifyThat("#lblError", isVisible());
         verifyThat(priceFormatError, isVisible());
+        
+        push(KeyCode.ENTER);
+        push(KeyCode.ENTER);
+        verifyThat("#lblError", isInvisible());
+        
         col = lookup(".table-cell").nth(colPos.colPrice.ordinal()).query();
         doubleClickOn(col);
         write("asdashjdh");
         push(KeyCode.ENTER);
         verifyThat("#lblError", isVisible());
         verifyThat(priceFormatError, isVisible());
+        
+        push(KeyCode.ENTER);
+        push(KeyCode.ENTER);
+        verifyThat("#lblError", isInvisible());
     }
     
     @Test
