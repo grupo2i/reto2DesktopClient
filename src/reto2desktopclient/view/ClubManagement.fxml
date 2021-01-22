@@ -28,8 +28,8 @@
             <contextMenu>
                 <ContextMenu fx:id="clubContextMenu">
                     <items>
-                        <MenuItem fx:id="menuItemSeeEvents" mnemonicParsing="false" text="See events" />
-                        <MenuItem fx:id="menuItemDisableClub" mnemonicParsing="false" text="Disable Club" />
+                        <MenuItem fx:id="menuItemSeeEvents" onAction="#handleButtonSeeEvents" mnemonicParsing="false" text="See events" />
+                        <MenuItem fx:id="menuItemDeleteClub" onAction="#handleButtonDelete" mnemonicParsing="false" text="Delete Club" />
                     </items>
                 </ContextMenu>
             </contextMenu>
