@@ -28,7 +28,8 @@ import reto2desktopclient.model.UserStatus;
 import reto2desktopclient.view.ClientManagementController;
 
 /**
- *
+ * Tests Client Management controller.
+ * 
  * @author Aitor Fidalgo
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
