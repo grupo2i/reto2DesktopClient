@@ -16,10 +16,10 @@ public class UnexpectedErrorException extends Exception implements Serializable 
             = "An unexpected error occurred, please try later.";
 
     /**
-     * Constructs an UnexpectedErrorException.
+     * Constructs an UnexpectedErrorException with the {@link #DEFAULT_MESSAGE}.
      */
     public UnexpectedErrorException() {
-        
+        super(DEFAULT_MESSAGE);
     }
     
     /**

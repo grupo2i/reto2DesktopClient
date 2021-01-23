@@ -5,7 +5,9 @@
  */
 package reto2desktopclient.client;
 
-import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.core.NoContentException;
 
 /**
  *
@@ -13,11 +15,11 @@ import javax.ws.rs.ClientErrorException;
  */
 public interface UserManager {
     
-    public <T> T getPrivilege(Class<T> responseType, String login) throws ClientErrorException;
-    public void edit(Object requestEntity) throws ClientErrorException;
-    public <T> T find(Class<T> responseType, String id) throws ClientErrorException;
-    public <T> T signIn(Class<T> responseType, String login, String password) throws ClientErrorException;
-    public void create(Object requestEntity) throws ClientErrorException;
-    public void remove(String id) throws ClientErrorException;
+    public <T> T getPrivilege(Class<T> responseType, String login) throws InternalServerErrorException;
+    public void edit(Object requestEntity) throws InternalServerErrorException;
+    public <T> T find(Class<T> responseType, String id) throws InternalServerErrorException, NoContentException;
+    public <T> T signIn(Class<T> responseType, String login, String password) throws InternalServerErrorException, NotAuthorizedException;
+    public void create(Object requestEntity) throws InternalServerErrorException;
+    public void remove(String id) throws InternalServerErrorException;
     public void close();
 }

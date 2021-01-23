@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="647.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="reto2desktopclient.view.ClientManagementController">
+<BorderPane fx:id="borderPaneClientManagement" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="647.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="reto2desktopclient.view.ClientManagementController">
     <top>
         <fx:include fx:id="adminMenu" source="AdminMenu.fxml" />
     </top>
@@ -29,7 +29,7 @@
                         <ContextMenu fx:id="contextMenu">
                             <items>
                                 <MenuItem fx:id="menuItemNewClient" mnemonicParsing="false" onAction="#handleNewClient" text="New Client" />
-                                <MenuItem fx:id="menuItemSeeEvents" mnemonicParsing="false" onAction="#handleSeeEvents" text="See Events" />
+                                <MenuItem fx:id="menuItemSeeEvents" id="menuItemSeeEvents" mnemonicParsing="false" onAction="#handleSeeEvents" text="See Events" />
                             </items>
                         </ContextMenu>
                     </contextMenu>

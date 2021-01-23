@@ -17,7 +17,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableCell;
@@ -29,7 +32,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.GenericType;
 import reto2desktopclient.client.ClientManager;
 import reto2desktopclient.client.ClientManagerFactory;
@@ -182,128 +185,178 @@ public class ClientManagementController {
             //Setting edit commit event handler to login column.
             tableColLogin.setOnEditCommit(
                 (CellEditEvent<Client, String> t) -> {
-                    LOGGER.log(Level.INFO, "Handling Login column edit commit event...");
-                    if (dataLengthIsValid(t.getNewValue())) {
-                        Client newClient = t.getRowValue();
-                        newClient.setLogin(t.getNewValue());
-                        //Getting a list of all registered clients 
-                        //to check the login is not registered already.
-                        boolean loginIsValid = true;
-                        ObservableList<Client> clients = FXCollections.observableList(
-                                CLIENT_MANAGER.getAllClients(new GenericType<List<Client>>() {
-                        }));
-                        //Checking the login is not registered already...
-                        for(Client client:clients) {
-                            //Checking that the login is not null to avoid NullPointerException.
-                            if(client.getLogin() != null) {
-                                if(client.getLogin().equalsIgnoreCase(newClient.getLogin())) {
-                                    loginIsValid = false;
-                                    //Showing login is already registered error message.
-                                    lblInputError.setText("* Login is already registered.");
-                                    lblInputError.setVisible(true);
-                                    //Updating the table with the list of clients
-                                    //retrieved from database.
-                                    tableClients.setItems(clients);
-                                    tableClients.refresh();
-                                    break;
+                    try {
+                        LOGGER.log(Level.INFO, "Handling Login column edit commit event...");
+                        if (dataLengthIsValid(t.getNewValue())) {
+                            Client newClient = t.getRowValue();
+                            newClient.setLogin(t.getNewValue());
+                            //Getting a list of all registered clients 
+                            //to check the login is not registered already.
+                            boolean loginIsValid = true;
+                            ObservableList<Client> clients = FXCollections.observableList(
+                                    CLIENT_MANAGER.getAllClients(new GenericType<List<Client>>() {
+                            }));
+                            //Checking the login is not registered already...
+                            for(Client client:clients) {
+                                //Checking that the login is not null to avoid NullPointerException.
+                                //and new Client is not compared to itself.
+                                if(client.getLogin() != null && !client.getId().equals(newClient.getId())) {
+                                    if(client.getLogin().equalsIgnoreCase(newClient.getLogin())) {
+                                        loginIsValid = false;
+                                        //Showing login is already registered error message.
+                                        lblInputError.setText("* Login is already registered.");
+                                        lblInputError.setVisible(true);
+                                        break;
+                                    }
                                 }
                             }
+                            //If login is not already registered update the database
+                            //with the new Client.
+                            if(loginIsValid) {
+                                LOGGER.log(Level.INFO, "Updating Clients login in the"
+                                        + " database on Login column edit commit handling...");
+                                //Hiding login is already registered error message.
+                                lblInputError.setVisible(false);
+                                //Updating newClient in the database.
+                                CLIENT_MANAGER.edit(newClient);
+                            } else {
+                                //Getting the row number where the new client was.
+                                int rowIndex = tableClients.getItems().indexOf(t.getRowValue());
+                                //Getting new clients old value manually...
+                                for(Client client:clients) {
+                                    if(client.getId().equals(newClient.getId())) {
+                                        newClient = clients.remove(clients.indexOf(client));
+                                        break;
+                                    }
+                                }
+                                //Resetting the items of the table and placing
+                                //the new client where it was before.
+                                tableClients.setItems(clients);
+                                tableClients.getItems().add(rowIndex, newClient);
+                                tableClients.getSelectionModel().select(rowIndex);
+                            }
+                        } else {
+                            //Resetting old value if new value is not valid.
+                            t.getRowValue().setLogin(t.getOldValue());
+                            tableClients.refresh();
                         }
-                        //If login is not already registered update the database
-                        //with the new Client.
-                        if(loginIsValid) {
-                            LOGGER.log(Level.INFO, "Updating Clients login in the"
-                                    + " database on Login column edit commit handling...");
-                            //Hiding login is already registered error message.
-                            lblInputError.setVisible(false);
-                            //Updating newClient in the database.
-                            CLIENT_MANAGER.edit(newClient);
-                        }
-                    } else {
-                        //Resetting old value if new value is not valid.
-                        t.getRowValue().setLogin(t.getOldValue());
-                        tableClients.refresh();
+                    } catch(InternalServerErrorException ex) {
+                        LOGGER.log(Level.SEVERE, ex.getMessage());
+                        LOGGER.log(Level.SEVERE, ex.getCause().getMessage());
+                        showErroAlert(ex.getCause().getMessage());
                     }
                 });
             //Setting edit commit event handler to email column.
             tableColEmail.setOnEditCommit(
                 (CellEditEvent<Client, String> t) -> {
-                    LOGGER.log(Level.INFO, "Handling Email column edit commit event...");
-                    if (dataLengthIsValid(t.getNewValue())
-                    && emailPatternIsValid(t.getNewValue())) {
-                        Client newClient = t.getRowValue();
-                        newClient.setEmail(t.getNewValue());
-                        boolean emailIsValid = true;
-                        //Getting a list of all registered clients 
-                        //to check the login is not registered already.
-                        ObservableList<Client> clients = FXCollections.observableList(
-                                CLIENT_MANAGER.getAllClients(new GenericType<List<Client>>() {
-                        }));
-                        //Checking the email is not registered already...
-                        for(Client client:clients) {
-                            //Checking that the email is not null to avoid NullPointerException.
-                            if(client.getEmail() != null) {
-                                if(client.getEmail().equalsIgnoreCase(newClient.getEmail())) {
-                                    emailIsValid = false;
-                                    //Showing email is already registered error message.
-                                    lblInputError.setText("* Email is already registered.");
-                                    lblInputError.setVisible(true);
-                                    //Updating the table with the list of clients
-                                    //retrieved from database.
-                                    tableClients.setItems(clients);
-                                    tableClients.refresh();
-                                    break;
+                    try {
+                        LOGGER.log(Level.INFO, "Handling Email column edit commit event...");
+                        if (dataLengthIsValid(t.getNewValue())
+                        && emailPatternIsValid(t.getNewValue())) {
+                            Client newClient = t.getRowValue();
+                            newClient.setEmail(t.getNewValue());
+                            boolean emailIsValid = true;
+                            //Getting a list of all registered clients 
+                            //to check the login is not registered already.
+                            ObservableList<Client> clients = FXCollections.observableList(
+                                    CLIENT_MANAGER.getAllClients(new GenericType<List<Client>>() {
+                            }));
+                            //Checking the email is not registered already...
+                            for(Client client:clients) {
+                                //Checking that the email is not null to avoid NullPointerException.
+                                //and new Client is not compared to itself.
+                                if(client.getEmail() != null && !client.getId().equals(newClient.getId())) {
+                                    if(client.getEmail().equalsIgnoreCase(newClient.getEmail())) {
+                                        emailIsValid = false;
+                                        //Showing email is already registered error message.
+                                        lblInputError.setText("* Email is already registered.");
+                                        lblInputError.setVisible(true);
+                                        break;
+                                    }
                                 }
                             }
+                            //If email is not already registered update the database
+                            //with the new Client.
+                            if(emailIsValid) {
+                                LOGGER.log(Level.INFO, "Updating Clients email in the"
+                                        + " database on Email column edit commit handling...");
+                                //Hiding login is already registered error message.
+                                lblInputError.setVisible(false);
+                                //Updating newClient in the database.
+                                CLIENT_MANAGER.edit(newClient);
+                            } else {
+                                //Getting the row number where the new client was.
+                                int rowIndex = tableClients.getItems().indexOf(t.getRowValue());
+                                //Getting new clients old value manually...
+                                for(Client client:clients) {
+                                    if(client.getId().equals(newClient.getId())) {
+                                        newClient = clients.remove(clients.indexOf(client));
+                                        break;
+                                    }
+                                }
+                                //Resetting the items of the table and placing
+                                //the new client where it was before.
+                                tableClients.setItems(clients);
+                                tableClients.getItems().add(rowIndex, newClient);
+                                tableClients.getSelectionModel().select(rowIndex);
+                            }
+                        } else {
+                            //Resetting old value if new value is not valid.
+                            t.getRowValue().setEmail(t.getOldValue());
+                            tableClients.refresh();
                         }
-                        //If email is not already registered update the database
-                        //with the new Client.
-                        if(emailIsValid) {
-                            LOGGER.log(Level.INFO, "Updating Clients email in the"
-                                    + " database on Email column edit commit handling...");
-                            //Hiding login is already registered error message.
-                            lblInputError.setVisible(false);
-                            //Updating newClient in the database.
-                            CLIENT_MANAGER.edit(newClient);
-                        }
-                    } else {
-                        //Resetting old value if new value is not valid.
-                        t.getRowValue().setEmail(t.getOldValue());
-                        tableClients.refresh();
+                    } catch(InternalServerErrorException ex) {
+                        LOGGER.log(Level.SEVERE, ex.getMessage());
+                        LOGGER.log(Level.SEVERE, ex.getCause().getMessage());
+                        showErroAlert(ex.getCause().getMessage());
                     }
                 });
             //Setting edit commit event handler to full name column.
             tableColFullName.setOnEditCommit(
                 (CellEditEvent<Client, String> t) -> {
-                    LOGGER.log(Level.INFO, "Handling Full Name column edit commit event...");
-                    if (dataLengthIsValid(t.getNewValue())) {
-                        LOGGER.log(Level.INFO, "Updating Clients full name in the"
-                                + " database on Full Name column edit commit handling...");
-                        //Updating newClient in the database.
-                        Client client = t.getRowValue();
-                        client.setFullName(t.getNewValue());
-                        CLIENT_MANAGER.edit(client);
-                        lblInputError.setVisible(false);
-                    } else {
-                        //Resetting old value if new value is not valid.
-                        t.getRowValue().setFullName(t.getOldValue());
-                        tableClients.refresh();
+                    try {
+                        LOGGER.log(Level.INFO, "Handling Full Name column edit commit event...");
+                        if (dataLengthIsValid(t.getNewValue())) {
+                            LOGGER.log(Level.INFO, "Updating Clients full name in the"
+                                    + " database on Full Name column edit commit handling...");
+                            //Updating newClient in the database.
+                            Client client = t.getRowValue();
+                            client.setFullName(t.getNewValue());
+                            CLIENT_MANAGER.edit(client);
+                            lblInputError.setVisible(false);
+                        } else {
+                            //Resetting old value if new value is not valid.
+                            t.getRowValue().setFullName(t.getOldValue());
+                            tableClients.refresh();
+                        }
+                    } catch(InternalServerErrorException ex) {
+                        LOGGER.log(Level.SEVERE, ex.getMessage());
+                        LOGGER.log(Level.SEVERE, ex.getCause().getMessage());
+                        showErroAlert(ex.getCause().getMessage());
                     }
                 });
             //Setting edit commit event handler to user status column.
             tableColStatus.setOnEditCommit(
                 (CellEditEvent<Client, UserStatus> t) -> {
-                    LOGGER.log(Level.INFO, "Handling Status column edit commit event...");
-                    Client newClient = t.getRowValue();
-                    newClient.setUserStatus(t.getNewValue());
-                    //Updating newClient in the database.
-                    LOGGER.log(Level.INFO, "Updating Clients status in the database"
-                            + " on Status column edit commit handling...");
-                    CLIENT_MANAGER.edit(newClient);
-                    lblInputError.setVisible(false);
+                    try {
+                        LOGGER.log(Level.INFO, "Handling Status column edit commit event...");
+                        Client newClient = t.getRowValue();
+                        newClient.setUserStatus(t.getNewValue());
+                        //Updating newClient in the database.
+                        LOGGER.log(Level.INFO, "Updating Clients status in the database"
+                                + " on Status column edit commit handling...");
+                        CLIENT_MANAGER.edit(newClient);
+                        lblInputError.setVisible(false);
+                    } catch(InternalServerErrorException ex) {
+                        LOGGER.log(Level.SEVERE, ex.getMessage());
+                        LOGGER.log(Level.SEVERE, ex.getCause().getMessage());
+                        showErroAlert(ex.getCause().getMessage());
+                    }
                 });
-        } catch (ClientErrorException ex) {
+        } catch (InternalServerErrorException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage());
+            LOGGER.log(Level.SEVERE, ex.getCause().getMessage());
+            showErroAlert(ex.getCause().getMessage());
         }
     }
 
@@ -329,6 +382,7 @@ public class ClientManagementController {
             dataIsValid = false;
         } else {
             //Hiding error message label.
+            lblInputError.setText("");
             lblInputError.setVisible(false);
         }
 
@@ -381,6 +435,17 @@ public class ClientManagementController {
             menuItemSeeEvents.setDisable(true);
         }
     }
+    
+    /**
+     * Shows an error Alert window with the specified message.
+     * 
+     * @param errorMessage The specified message.
+     */
+    private void showErroAlert(String errorMessage) {
+        LOGGER.log(Level.INFO, "Showing Alert window with error message...");
+        Alert errorAlert = new Alert(AlertType.ERROR, errorMessage, ButtonType.OK);
+        errorAlert.show();
+    }
 
     /**
      * Handles the creation of a new Client both in the table and database.
@@ -406,15 +471,26 @@ public class ClientManagementController {
             LOGGER.log(Level.INFO, "Updating database with new Client on New"
                     + " Client creation request handling...");
             CLIENT_MANAGER.create(newClient);
-            //Adding the new Client to the tabla view.
-            tableClients.getItems().add(newClient);
+            clientsData = FXCollections.observableList(CLIENT_MANAGER
+                    .getAllClients(new GenericType<List<Client>>() {
+            }));
+            //Removing the new Client so it does not appear at the end of the table.
+            Client client = (Client) clientsData.remove(clientsData.size() - 1);
+            //Adding the clientsData to the tabla view.
+            tableClients.setItems(clientsData);
+            //Adding the new Client to the beginning of the table.
+            tableClients.getItems().add(0, client);
             //Refreshing the table so that the new Client appears.
             tableClients.refresh();
             //Select the new row and scroll to it.
-            tableClients.getSelectionModel().select(tableClients.getItems().size() - 1, tableColLogin);
-            tableClients.scrollTo(newClient);
-        } catch (ClientErrorException | UnexpectedErrorException ex) {
+            tableClients.getSelectionModel().select(0, tableColLogin);
+        } catch (InternalServerErrorException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage());
+            LOGGER.log(Level.SEVERE, ex.getCause().getMessage());
+            showErroAlert(ex.getCause().getMessage());
+        } catch (UnexpectedErrorException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage());
+            showErroAlert(ex.getMessage());
         }
 
     }
@@ -444,6 +520,8 @@ public class ClientManagementController {
             controller.initStage(root);
         } catch (IOException ex) {
             LOGGER.log(Level.SEVERE, "Could not switch to EventManagement window: {0}", ex.getMessage());
+            showErroAlert("Could not switch to Event Management window due to an"
+                    + " unexpected error, please try later.");
         }
     }
     
