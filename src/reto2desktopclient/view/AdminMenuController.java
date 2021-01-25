@@ -18,9 +18,6 @@ import javafx.stage.Stage;
  */
 public class AdminMenuController {
 
-    /**
-     * Logger used to leave traces.
-     */
     private static final Logger LOGGER = Logger.getLogger(AdminMenuController.class.getName());
 
     @FXML

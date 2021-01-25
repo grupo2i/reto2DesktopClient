@@ -33,7 +33,7 @@ public class UserRESTClient implements UserManager {
         webTarget = client.target(BASE_URI).path("entity.user");
     }
 
-    public <T> T getPrivilege(Class<T> responseType, String login) throws InternalServerErrorException {
+    public <T> T getPrivilege(Class<T> responseType, String login) throws InternalServerErrorException, NotAuthorizedException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("getPrivilege/{0}", new Object[]{login}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
