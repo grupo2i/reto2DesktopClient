@@ -140,13 +140,13 @@ public class ClubProfileController {
         stage.setTitle("Club Profile");
         stage.setResizable(false);
         stage.setOnShowing(this::handleWindowShowing);
-        /* txtName.setText(clubSign.getFullName());
+        txtName.setText(clubSign.getFullName());
         txtLogin.setText(clubSign.getLogin());
         txtEmail.setText(clubSign.getEmail());
         txtLocation.setText(clubSign.getLocation());
         txtPhoneNumber.setText(clubSign.getPhoneNum());
         pwdPassword.setText(clubSign.getPassword());
-        txtBiography.setText(clubSign.getBiography());*/
+        txtBiography.setText(clubSign.getBiography());
         stage.show();
     }
 

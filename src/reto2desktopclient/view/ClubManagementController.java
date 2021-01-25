@@ -1,18 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package reto2desktopclient.view;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.sql.Types;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -43,22 +33,24 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
-import reto2desktopclient.client.ClientManagerFactory;
 import reto2desktopclient.client.ClubManagerFactory;
 import reto2desktopclient.exceptions.UnexpectedErrorException;
 import reto2desktopclient.exceptions.UserInputException;
-import reto2desktopclient.model.Client;
 import reto2desktopclient.model.Club;
 import reto2desktopclient.model.UserPrivilege;
 import reto2desktopclient.model.UserStatus;
 import reto2desktopclient.security.PublicCrypt;
 
 /**
+ * Controller for the ClubManagement window.
  *
  * @author Ander
  */
 public class ClubManagementController {
 
+    /**
+     * Logger used to leave traces.
+     */
     private static final Logger LOGGER = Logger.getLogger(ClubManagementController.class.getName());
 
     @FXML
@@ -150,6 +142,11 @@ public class ClubManagementController {
     boolean errorStatusPattern = true;
     boolean tableIsSelected = false;
 
+    /**
+     * Initializes the stage of the window.
+     *
+     * @param root Parent of all nodes in the scene graph.
+     */
     public void initStage(Parent root) {
         Scene scene = new Scene(root);
         Logger.getLogger(ClubManagementController.class.getName()).log(Level.INFO, "Initializing stage...");
@@ -171,8 +168,14 @@ public class ClubManagementController {
         stage = primaryStage;
     }
 
+    /**
+     * Handles the showing event of the stage by initializing window elements.
+     *
+     * @param event Showing event of the stage.
+     */
     private void handleWindowShowing(WindowEvent event) {
         try {
+            //Initializing labels and components.
             lblErrorLogin.setVisible(false);
             lblErrorEmail.setVisible(false);
             lblErrorName.setVisible(false);
@@ -222,6 +225,13 @@ public class ClubManagementController {
 
     }
 
+    /**
+     * Handles club table selection changes
+     *
+     * @param observable Table selected item property.
+     * @param oldVaue Old value of the observable property.
+     * @param newValue New value of the observable property.
+     */
     private void handleClubTableSelectionChange(ObservableValue observable,
             Object oldVaue, Object newValue) {
         tableIsSelected = true;
@@ -250,6 +260,11 @@ public class ClubManagementController {
         }
     }
 
+    /**
+     * Checks if login textfield is valid (lenght).
+     *
+     * @param obs
+     */
     private void handleTextLogin(Observable obs) {
         Integer usLenght = txtLogin.getText().trim().length();
         //if username =0 or <255= error
@@ -269,6 +284,11 @@ public class ClubManagementController {
         testLabels();
     }
 
+    /**
+     * Checks if email textfield is valid (lenght & pattern).
+     *
+     * @param obs
+     */
     private void handleTextEmail(Observable obs) {
         Integer txtEmailLength = txtEmail.getText().trim().length();
         Pattern patternEmail = Pattern.compile("^[\\w-]+(\\.[\\w-]+)*@"
@@ -299,6 +319,11 @@ public class ClubManagementController {
         testLabels();
     }
 
+    /**
+     * Checks if name textfield is valid (lenght & pattern).
+     *
+     * @param obs
+     */
     private void handleTextName(Observable obs) {
         Integer txtNameLength = txtName.getText().trim().length();
         Pattern patternName = Pattern.compile("^([A-zÀ-ú]+[ ]?)+$");
@@ -327,6 +352,11 @@ public class ClubManagementController {
         testLabels();
     }
 
+    /**
+     * Checks if location textfield is valid (lenght).
+     *
+     * @param obs
+     */
     private void handleTextLocation(Observable obs) {
         Integer txtLocationLength = txtLocation.getText().trim().length();
         if (txtLocationLength == 0 || txtLocationLength > 255) {
@@ -348,6 +378,11 @@ public class ClubManagementController {
         testLabels();
     }
 
+    /**
+     * Checks if phone number textfield is valid (lenght & pattern).
+     *
+     * @param obs
+     */
     private void handleTextPhoneNumber(Observable obs) {
         Integer txtPhoneNumberLenght = txtPhoneNumber.getText().trim().length();
         Pattern patternPhoneNumber = Pattern.compile("[0-9]+");
@@ -374,6 +409,11 @@ public class ClubManagementController {
         testLabels();
     }
 
+    /**
+     * Checks if status textfield is valid (lenght & 2 options).
+     *
+     * @param obs
+     */
     private void handleTextStatus(Observable obs) {
         String status = txtStatus.getText();
         Integer txtStatusLenght = txtStatus.getText().trim().length();
@@ -405,6 +445,12 @@ public class ClubManagementController {
         testLabels();
     }
 
+    /**
+     * Handles the creation of a new club if all data is correct
+     *
+     * @param event
+     * @throws UserInputException in caso something goes wrong.
+     */
     @FXML
     public void handleButtonAdd(ActionEvent event) throws UserInputException {
         try {
@@ -461,6 +507,12 @@ public class ClubManagementController {
         }
     }
 
+    /**
+     * Hanldes club delete from table and database.
+     *
+     * @param event
+     * @throws UserInputException in case somethgin goes wrong.
+     */
     @FXML
     public void handleButtonDelete(ActionEvent event) throws UserInputException {
         try {
@@ -493,6 +545,13 @@ public class ClubManagementController {
         }
     }
 
+    /**
+     * After table item selection, puts the selected club in form and handles
+     * its club update both in table and database.
+     *
+     * @param event
+     * @throws UserInputException in case something goes wrong.
+     */
     @FXML
     public void handleButtonUpdate(ActionEvent event) throws UserInputException {
         Club selectedClub = ((Club) clubTable.getSelectionModel().getSelectedItem());
@@ -539,6 +598,13 @@ public class ClubManagementController {
         ClubManagerFactory.getClubManager().edit(selectedClub);
     }
 
+    /**
+     * After table item selection enables see events button of selected club
+     * navigates to events window with selected club.
+     *
+     * @param event
+     * @throws UserInputException
+     */
     @FXML
     public void handleButtonSeeEvents(ActionEvent event) throws UserInputException {
         Club selectedClub = ((Club) clubTable.getSelectionModel().getSelectedItem());
@@ -574,6 +640,9 @@ public class ClubManagementController {
         }
     }
 
+    /**
+     * resets all components.
+     */
     private void resetFieldsAndLabels() {
         txtEmail.setText("");
         txtLocation.setText("");
@@ -589,6 +658,12 @@ public class ClubManagementController {
         lblErrorStatus.setVisible(false);
     }
 
+    /**
+     *
+     * checks in database if introduced login exists or not.
+     *
+     * @return true if finds login.
+     */
     private boolean findLogin() {
         List<Club> clubfind = ClubManagerFactory.getClubManager()
                 .getAllClubs(new GenericType<List<Club>>() {
@@ -604,6 +679,12 @@ public class ClubManagementController {
         return usernameExists;
     }
 
+    /**
+     *
+     * checks in database if introduced email exists or not.
+     *
+     * @return true if finds login.
+     */
     private boolean findEmail() {
         List<Club> clubfindmail = ClubManagerFactory.getClubManager()
                 .getAllClubs(new GenericType<List<Club>>() {
@@ -619,6 +700,12 @@ public class ClubManagementController {
         return emailExists;
     }
 
+    /**
+     *
+     * checks in database if introduced login and email exist or not.
+     *
+     * @return true if finds login or mail in its boolean value.
+     */
     private void findUserAndEmail() {
         List<Club> find = ClubManagerFactory.getClubManager()
                 .getAllClubs(new GenericType<List<Club>>() {

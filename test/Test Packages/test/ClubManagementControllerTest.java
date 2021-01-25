@@ -32,7 +32,7 @@ import reto2desktopclient.model.Club;
 import reto2desktopclient.view.ClubManagementController;
 
 /**
- *
+ * test for club management window.
  * @author 2dam
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
