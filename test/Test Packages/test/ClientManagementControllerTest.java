@@ -9,7 +9,6 @@ import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -21,7 +20,6 @@ import static org.testfx.matcher.base.NodeMatchers.isEnabled;
 import static org.testfx.matcher.base.NodeMatchers.isFocused;
 import static org.testfx.matcher.base.NodeMatchers.isInvisible;
 import static org.testfx.matcher.base.NodeMatchers.isVisible;
-import reto2desktopclient.Reto2DesktopClient;
 import reto2desktopclient.model.Client;
 import reto2desktopclient.model.UserPrivilege;
 import reto2desktopclient.model.UserStatus;
@@ -35,6 +33,9 @@ import reto2desktopclient.view.ClientManagementController;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ClientManagementControllerTest extends ApplicationTest {
     
+    /**
+     * Oversized text to test overflow error.
+     */
     private static final String OVERSIZED_TEXT="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"+
                                                "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"+
                                                "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"+
@@ -56,7 +57,6 @@ public class ClientManagementControllerTest extends ApplicationTest {
      */
     @Override
     public void start(Stage stage) throws Exception {
-        //new Reto2DesktopClient().start(stage);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/ClientManagement.fxml"));
         Parent root = (Parent) loader.load();
         //Getting window controller.
@@ -69,19 +69,9 @@ public class ClientManagementControllerTest extends ApplicationTest {
         lblInputError = lookup("#lblInputError").query();
     }
     
-    /*@Test
-    @Before
-    public void testA_InitialInteraction() {
-        clickOn("#txtUsername");
-        write("admin");
-        clickOn("#pwdPassword");
-        write("1234");
-        clickOn("#btnAccept");
-        verifyThat("#borderPaneClientManagement", isVisible());
-    }*/
     
     @Test
-    @Ignore
+    //@Ignore
     public void testB_InitialState() {
         verifyThat("#btnNewClient", isFocused());
         verifyThat("#btnNewClient", isEnabled());
@@ -91,7 +81,7 @@ public class ClientManagementControllerTest extends ApplicationTest {
     }
     
     @Test
-    @Ignore
+    //@Ignore
     public void testC_ClientCreation() {
         int rowNumber = table.getItems().size();
         clickOn("#btnNewClient");
@@ -112,7 +102,7 @@ public class ClientManagementControllerTest extends ApplicationTest {
      * Tests that the table is updated when an edit commit happens.
      */
     @Test
-    @Ignore
+    //@Ignore
     public void testD_ClientUpdate() {
         clickOn("#btnNewClient");
         updateCell(0, "alreadyRegisteredLogin");
@@ -143,27 +133,48 @@ public class ClientManagementControllerTest extends ApplicationTest {
     
     /**
      * Tests that errors when login column is edited are controled.
+     * 
+     * This method tests a 'login already registered' error that is why it is
+     * important to have previously executed the test D or to have a registered
+     * user with the login 'alreadyRegisteredLogin' in the database.
      */
     @Test
-    @Ignore
+    //@Ignore
     public void testE_ClientLoginEditingErrors() {
         clickOn("#btnNewClient");
+        Client client = (Client) table.getItems().get(0);
+        
         //Testing empty field on column login...
-        updateCell(0, "");
+        updateCell(0, "anyLogin");
+        updateSelectedCell("");
         verifyThat("* Fields must not be empty", isVisible());
-        updateSelectedCell("anyLogin");
+        //Testing old value is restored...
+        assertEquals("anyLogin", client.getLogin());
+        //Testing error label is hiden...
+        push(KeyCode.ENTER);
+        push(KeyCode.ENTER);
         verifyThat(lblInputError, isInvisible());
         
         //Testing too long data on column login...
         updateSelectedCell(OVERSIZED_TEXT);
         verifyThat("* All data must be less than 255 characters.", isVisible());
-        updateSelectedCell("anyLogin");
+        //Testing old value is restored...
+        assertEquals("anyLogin", client.getLogin());
+        //Testing error label is hiden...
+        push(KeyCode.ENTER);
+        push(KeyCode.ENTER);
         verifyThat(lblInputError, isInvisible());
         
         //Testing already registered login...
         updateSelectedCell("alreadyRegisteredLogin");
         verifyThat("* Login is already registered.", isVisible());
-        updateCell(0, "anyLogin");
+        //Testing old value is restored...
+        client = (Client) table.getItems().get(0);
+        assertEquals("anyLogin", client.getLogin());
+        //Testing error label is hiden...
+        Node cell = lookup(".table-cell").nth(0).query();
+        doubleClickOn(cell);
+        push(KeyCode.ENTER);
         verifyThat(lblInputError, isInvisible());
         
     }
@@ -175,39 +186,65 @@ public class ClientManagementControllerTest extends ApplicationTest {
      */
     private void updateSelectedCell(String text) {
         push(KeyCode.ENTER);
+        push(KeyCode.BACK_SPACE);
         write(text);
         push(KeyCode.ENTER);
     }
     
     /**
      * Tests that errors when email column is edited are controled.
+     * 
+     * This method tests an 'email already registered' error that is why it is
+     * important to have previously executed the test D or to have a registered
+     * user with the email 'alredyRegistered@email.com' in the database.
      */
     @Test
-    @Ignore
+    //@Ignore
     public void testF_ClientEmailEditingErrors() {
         clickOn("#btnNewClient");
+        Client client = (Client) table.getItems().get(0);
+        
         //Testing empty field on column email...
-        updateCell(1, "");
+        updateCell(1, "any@email.com");
+        updateSelectedCell("");
         verifyThat("* Fields must not be empty", isVisible());
-        updateSelectedCell("any@email.com");
+        //Testing old value is restored...
+        assertEquals("any@email.com", client.getEmail());
+        //Testing error label is hiden...
+        push(KeyCode.ENTER);
+        push(KeyCode.ENTER);
         verifyThat(lblInputError, isInvisible());
         
         //Testing too long data on column email...
         updateSelectedCell(OVERSIZED_TEXT);
         verifyThat("* All data must be less than 255 characters.", isVisible());
-        updateSelectedCell("any@email.com");
+        //Testing old value is restored...
+        assertEquals("any@email.com", client.getEmail());
+        //Testing error label is hiden...
+        push(KeyCode.ENTER);
+        push(KeyCode.ENTER);
         verifyThat(lblInputError, isInvisible());
         
         //Testing wrong pattern on column email...
         updateSelectedCell("wrongFormatEmail");
         verifyThat("* Email must match the following format:\n   jsmith@example.com", isVisible());
-        updateSelectedCell("any@email.com");
+        //Testing old value is restored...
+        assertEquals("any@email.com", client.getEmail());
+        //Testing error label is hiden...
+        push(KeyCode.ENTER);
+        push(KeyCode.ENTER);
         verifyThat(lblInputError, isInvisible());
         
         //Testing already registered email...
         updateSelectedCell("alredyRegistered@email.com");
         verifyThat("* Email is already registered.", isVisible());
-        updateCell(1, "any@email.com");
+        //Testing old value is restored...
+        client = (Client) table.getItems().get(0);
+        assertEquals("any@email.com", client.getEmail());
+        //Testing error label is hiden...
+        Node cell = lookup(".table-cell").nth(1).query();
+        doubleClickOn(cell);
+        push(KeyCode.ENTER);
         verifyThat(lblInputError, isInvisible());
     }
     
@@ -215,24 +252,35 @@ public class ClientManagementControllerTest extends ApplicationTest {
      * Tests that errors when full name column is edited are controled.
      */
     @Test
-    @Ignore
+    //@Ignore
     public void testG_ClientFullNameEditingErrors() {
         clickOn("#btnNewClient");
+        Client client = (Client) table.getItems().get(0);
+        
         //Testing empty field on column full name...
-        updateCell(2, "");
+        updateCell(2, "Any Full Name");
+        updateSelectedCell("");
         verifyThat("* Fields must not be empty", isVisible());
-        updateSelectedCell("Any Full Name");
+        //Testing old value is restored...
+        assertEquals("Any Full Name", client.getFullName());
+        //Testing error label is hiden...
+        push(KeyCode.ENTER);
+        push(KeyCode.ENTER);
         verifyThat(lblInputError, isInvisible());
         
         //Testing too long data on column full name...
         updateSelectedCell(OVERSIZED_TEXT);
         verifyThat("* All data must be less than 255 characters.", isVisible());
-        updateSelectedCell("Any Full Name");
+        //Testing old value is restored...
+        assertEquals("Any Full Name", client.getFullName());
+        //Testing error label is hiden...
+        push(KeyCode.ENTER);
+        push(KeyCode.ENTER);
         verifyThat(lblInputError, isInvisible());
     }
     
     @Test
-    @Ignore
+    //@Ignore
     public void testH_SeeEventsButtonEnableDisableOnSelectionChange() {
         Node cell;
         clickOn("#btnNewClient");
@@ -244,5 +292,4 @@ public class ClientManagementControllerTest extends ApplicationTest {
         verifyThat("#btnSeeEvents", isDisabled());
     }
     
-
 }

@@ -18,6 +18,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
+import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.ProcessingException;
 import reto2desktopclient.client.UserManagerFactory;
 import reto2desktopclient.exceptions.UnexpectedErrorException;
 import reto2desktopclient.model.Artist;
@@ -116,11 +118,19 @@ public class LogInController {
                     UserManagerFactory.getUserManager().edit(club);
                     switchToClubProfileWindow();
                     break;
+                default:
+                    showErroAlert("Invalid login, only Clubs, Artists and Administrators are allowed.");
+                    break;
             }
-            
+        } catch(NotAuthorizedException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage());
+            showErroAlert("User not found, incorrect login or password.");
         } catch (UnexpectedErrorException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage());
             showErroAlert(ex.getMessage());
+        } catch(ProcessingException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage());
+            showErroAlert("Could not process the request, please try later.");
         }
     }
     

@@ -33,6 +33,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.GenericType;
 import reto2desktopclient.client.ClientManager;
 import reto2desktopclient.client.ClientManagerFactory;
@@ -49,9 +50,6 @@ import reto2desktopclient.security.PublicCrypt;
  */
 public class ClientManagementController {
 
-    /**
-     * Logger used to leave traces.
-     */
     private static final Logger LOGGER = Logger
             .getLogger(ClientManagementController.class.getName());
     /**
@@ -244,6 +242,9 @@ public class ClientManagementController {
                         LOGGER.log(Level.SEVERE, ex.getMessage());
                         LOGGER.log(Level.SEVERE, ex.getCause().getMessage());
                         showErroAlert(ex.getCause().getMessage());
+                    } catch(ProcessingException ex) {
+                        LOGGER.log(Level.SEVERE, ex.getMessage());
+                        showErroAlert("Could not process the request, please try later.");
                     }
                 });
             //Setting edit commit event handler to email column.
@@ -309,6 +310,9 @@ public class ClientManagementController {
                         LOGGER.log(Level.SEVERE, ex.getMessage());
                         LOGGER.log(Level.SEVERE, ex.getCause().getMessage());
                         showErroAlert(ex.getCause().getMessage());
+                    } catch(ProcessingException ex) {
+                        LOGGER.log(Level.SEVERE, ex.getMessage());
+                        showErroAlert("Could not process the request, please try later.");
                     }
                 });
             //Setting edit commit event handler to full name column.
@@ -333,6 +337,9 @@ public class ClientManagementController {
                         LOGGER.log(Level.SEVERE, ex.getMessage());
                         LOGGER.log(Level.SEVERE, ex.getCause().getMessage());
                         showErroAlert(ex.getCause().getMessage());
+                    } catch(ProcessingException ex) {
+                        LOGGER.log(Level.SEVERE, ex.getMessage());
+                        showErroAlert("Could not process the request, please try later.");
                     }
                 });
             //Setting edit commit event handler to user status column.
@@ -351,12 +358,18 @@ public class ClientManagementController {
                         LOGGER.log(Level.SEVERE, ex.getMessage());
                         LOGGER.log(Level.SEVERE, ex.getCause().getMessage());
                         showErroAlert(ex.getCause().getMessage());
+                    } catch(ProcessingException ex) {
+                        LOGGER.log(Level.SEVERE, ex.getMessage());
+                        showErroAlert("Could not process the request, please try later.");
                     }
                 });
         } catch (InternalServerErrorException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getCause().getMessage());
             showErroAlert(ex.getCause().getMessage());
+        } catch(ProcessingException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage());
+            showErroAlert("Could not process the request, please try later.");
         }
     }
 
@@ -491,6 +504,9 @@ public class ClientManagementController {
         } catch (UnexpectedErrorException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage());
             showErroAlert(ex.getMessage());
+        } catch(ProcessingException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage());
+            showErroAlert("Could not process the request, please try later.");
         }
 
     }
