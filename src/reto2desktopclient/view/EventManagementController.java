@@ -30,10 +30,14 @@ import javafx.stage.Stage;
 import javafx.util.converter.DateStringConverter;
 import javafx.util.converter.FloatStringConverter;
 import javax.ws.rs.core.GenericType;
+import reto2desktopclient.client.ArtistManagerFactory;
+import reto2desktopclient.client.ClientManagerFactory;
+import reto2desktopclient.client.ClubManagerFactory;
 import reto2desktopclient.client.EventManager;
 import reto2desktopclient.client.EventManagerFactory;
 import reto2desktopclient.client.UserManagerFactory;
 import reto2desktopclient.model.Artist;
+import reto2desktopclient.model.Client;
 import reto2desktopclient.model.Club;
 import reto2desktopclient.model.Event;
 import reto2desktopclient.model.User;
@@ -74,6 +78,9 @@ public class EventManagementController {
     
     @FXML
     private Button btnAddEvent;
+    
+    @FXML
+    private Button btnRemoveEvent;
     
     private String userLogin;
     
@@ -150,7 +157,7 @@ public class EventManagementController {
                 tblEvents.refresh();
             } else {
                 Event currEvent = t.getRowValue();
-                currEvent.setName(t.getOldValue());
+                currEvent.setPlace(t.getOldValue());
                 tblEvents.refresh();
             }
         });
@@ -177,13 +184,32 @@ public class EventManagementController {
                 tblEvents.refresh();
             } else {
                 Event currEvent = t.getRowValue();
-                currEvent.setName(t.getOldValue());
+                currEvent.setDescription(t.getOldValue());
                 tblEvents.refresh();
             }
         });
         
         //Get data and add it to the table
         refreshData();
+        
+        if(userLogin != null) {
+            //Find user events
+            User userPrivilege = UserManagerFactory.getUserManager().getPrivilege(User.class, userLogin);
+            switch(userPrivilege.getUserPrivilege()) {
+                case CLIENT:
+                    btnAddEvent.setDisable(true);
+                    btnRemoveEvent.setDisable(true);
+                    break;
+                case ARTIST:
+                    btnAddEvent.setDisable(true);
+                    btnRemoveEvent.setDisable(true);
+                    break;
+                case CLUB:
+                    btnAddEvent.setDisable(true);
+                    btnRemoveEvent.setDisable(true);
+                    break;
+            }       
+        }
         
         LOGGER.log(Level.INFO, "Successfully switched to Event Management window.");
     }
@@ -210,7 +236,7 @@ public class EventManagementController {
     private void handleButtonAddEvent() {
         LOGGER.log(Level.INFO, "Adding event.");
         Event newEvent = new Event();
-        eventManager.create(newEvent);
+        eventManager.create(newEvent);      
         refreshData();
         tblEvents.refresh();
     }
@@ -232,13 +258,15 @@ public class EventManagementController {
                 case ADMIN:
                     eventData = FXCollections.observableArrayList(eventManager.getAllEvents(new GenericType<List<Event>>(){}));
                     break;
+                case CLIENT:
+                    Client client = UserManagerFactory.getUserManager().getUserByLogin(Client.class, userLogin);
+                    eventData = FXCollections.observableArrayList(client.getEvents());
+                    break;
                 case ARTIST:
-                    //Retrieving Artist from signIn method.
                     Artist artist = UserManagerFactory.getUserManager().getUserByLogin(Artist.class, userLogin);
                     eventData = FXCollections.observableArrayList(artist.getEvents());
                     break;
                 case CLUB:
-                    //Retrieving Club from signIn method.
                     Club club = UserManagerFactory.getUserManager().getUserByLogin(Club.class, userLogin);
                     eventData = FXCollections.observableArrayList(club.getEvents());
                     break;

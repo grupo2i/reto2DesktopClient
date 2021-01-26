@@ -7,6 +7,7 @@ package reto2desktopclient.client;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.ConnectException;
+import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.NoContentException;
