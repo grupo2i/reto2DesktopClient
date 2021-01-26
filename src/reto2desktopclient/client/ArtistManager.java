@@ -6,6 +6,7 @@
 package reto2desktopclient.client;
 
 import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.core.GenericType;
 
 /**
  *
@@ -13,10 +14,10 @@ import javax.ws.rs.ClientErrorException;
  */
 public interface ArtistManager {
 
-    public <T> T getAllArtists(Class<T> responseType) throws ClientErrorException;
     public void edit(Object requestEntity) throws ClientErrorException;
     public <T> T find(Class<T> responseType, String id) throws ClientErrorException;
     public void create(Object requestEntity) throws ClientErrorException;
+    public <T> T getAllArtists(GenericType<T> responseType) throws ClientErrorException;
     public void remove(String id) throws ClientErrorException;
     public void close();
 }
