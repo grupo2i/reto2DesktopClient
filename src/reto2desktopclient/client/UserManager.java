@@ -17,6 +17,8 @@ import javax.ws.rs.core.NoContentException;
  */
 public interface UserManager {
     
+    public <T> T getUserByLogin(Class<T> responseType, String login) throws ClientErrorException;
+
     public <T> T getPrivilege(Class<T> responseType, String login)
             throws InternalServerErrorException, NotAuthorizedException;
     
@@ -34,6 +36,6 @@ public interface UserManager {
     
     public void remove(String id) 
             throws InternalServerErrorException;
-    
+
     public void close();
 }

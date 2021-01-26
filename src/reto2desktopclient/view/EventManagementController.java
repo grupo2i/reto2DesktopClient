@@ -5,17 +5,21 @@
  */
 package reto2desktopclient.view;
 
-import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -28,10 +32,15 @@ import javafx.util.converter.FloatStringConverter;
 import javax.ws.rs.core.GenericType;
 import reto2desktopclient.client.EventManager;
 import reto2desktopclient.client.EventManagerFactory;
+import reto2desktopclient.client.UserManagerFactory;
+import reto2desktopclient.model.Artist;
+import reto2desktopclient.model.Club;
 import reto2desktopclient.model.Event;
+import reto2desktopclient.model.User;
 
 /**
- * 
+ * TODO: Check price and date conditions for lblErrors
+ * Don't save long strings.
  * @author Martin Angulo
  */
 public class EventManagementController {
@@ -63,6 +72,9 @@ public class EventManagementController {
     @FXML
     private Label lblError;
     
+    @FXML
+    private Button btnAddEvent;
+    
     private String userLogin;
     
     /**
@@ -81,6 +93,9 @@ public class EventManagementController {
         //Hide label
         lblError.setVisible(false);
         
+        //Focus add event button
+        btnAddEvent.requestFocus();
+        
         //Make the table editable
         tblEvents.setEditable(true);
         tblEvents.getSelectionModel().cellSelectionEnabledProperty().set(true);
@@ -94,7 +109,7 @@ public class EventManagementController {
         
         colName.setCellFactory(TextFieldTableCell.forTableColumn());
         //Pass Date to String converter
-        colDate.setCellFactory(TextFieldTableCell.forTableColumn(new MyDateStringConverter("MM/dd/yy")));       
+        colDate.setCellFactory(TextFieldTableCell.forTableColumn(new MyDateStringConverter("dd/MM/yy")));       
         colPlace.setCellFactory(TextFieldTableCell.forTableColumn());
         //Pass Float to String converter
         colPrice.setCellFactory(TextFieldTableCell.forTableColumn(new MyFloatStringConverter()));
@@ -106,17 +121,24 @@ public class EventManagementController {
                 currEvent.setName(t.getNewValue());
                 eventManager.edit(currEvent);
                 tblEvents.refresh();
+            } else {
+                Event currEvent = t.getRowValue();
+                currEvent.setName(t.getOldValue());
+                tblEvents.refresh();
             }
         });
         colDate.setOnEditCommit((CellEditEvent<Event, Date> t) -> {
-            if(t.getNewValue() == null && 
-                !lblError.getText().equals("* Date must have format: mm/dd/yy\nand be possible.")) {
-                lblError.setText("* Field must not be empty.");
-                lblError.setVisible(true);
-            } else {
+            if(t.getNewValue() != null) {
                 Event currEvent = t.getRowValue();
                 currEvent.setDate(t.getNewValue());
                 eventManager.edit(currEvent);
+                tblEvents.refresh();
+            } else if(t.getNewValue() == null && 
+                !lblError.getText().equals("* Date must have format: dd/mm/yy\nand be possible.")) {
+                lblError.setText("* Field must not be empty.");
+                lblError.setVisible(true);
+                Event currEvent = t.getRowValue();
+                currEvent.setDate(t.getOldValue());
                 tblEvents.refresh();
             }
         });
@@ -126,18 +148,24 @@ public class EventManagementController {
                 currEvent.setPlace(t.getNewValue());
                 eventManager.edit(currEvent);
                 tblEvents.refresh();
+            } else {
+                Event currEvent = t.getRowValue();
+                currEvent.setName(t.getOldValue());
+                tblEvents.refresh();
             }
         });
         colPrice.setOnEditCommit((CellEditEvent<Event, Float> t) -> {
-            if(validatePrice(t.getNewValue()) && validateLength(t.getNewValue().toString())) {
+            if(t.getNewValue() != null && validatePrice(t.getNewValue())) {
                 Event currEvent = t.getRowValue();
                 currEvent.setTicketprice(t.getNewValue());
                 eventManager.edit(currEvent);
                 tblEvents.refresh();
-            } else {
+            } else if(t.getNewValue() == null && 
+                !lblError.getText().equals("* Field should be a positive number.")) {
+                lblError.setText("* Field must not be empty.");
+                lblError.setVisible(true);
                 Event currEvent = t.getRowValue();
-                currEvent.setTicketprice(null);
-                eventManager.edit(currEvent);
+                currEvent.setTicketprice(t.getOldValue());
                 tblEvents.refresh();
             }
         });
@@ -146,6 +174,10 @@ public class EventManagementController {
                 Event currEvent = t.getRowValue();
                 currEvent.setDescription(t.getNewValue());
                 eventManager.edit(currEvent);
+                tblEvents.refresh();
+            } else {
+                Event currEvent = t.getRowValue();
+                currEvent.setName(t.getOldValue());
                 tblEvents.refresh();
             }
         });
@@ -161,10 +193,14 @@ public class EventManagementController {
      */
     @FXML
     private void handleButtonRemoveEvent() {
-        LOGGER.log(Level.INFO, "Removing event.");
-        Event currEvent = (Event)tblEvents.getFocusModel().getFocusedItem();
-        eventManager.remove(currEvent.getId().toString());
-        refreshData();
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to delete an Event?", ButtonType.OK);
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            Event currEvent = (Event)tblEvents.getFocusModel().getFocusedItem();
+            LOGGER.log(Level.INFO, "Removing event with id: {0}", currEvent.getId());
+            eventManager.remove(currEvent.getId().toString());
+            refreshData();
+        }
     }
 
     /**
@@ -176,9 +212,6 @@ public class EventManagementController {
         Event newEvent = new Event();
         eventManager.create(newEvent);
         refreshData();
-        tblEvents.getSelectionModel().clearSelection();
-        tblEvents.getSelectionModel().select(tblEvents.getItems().size() - 1, colName);
-        tblEvents.scrollTo(newEvent);
         tblEvents.refresh();
     }
 
@@ -191,17 +224,40 @@ public class EventManagementController {
     }
     
     private void refreshData() {
-        eventData = FXCollections.observableArrayList(eventManager.getAllEvents(new GenericType<List<Event>>(){}));
+        Comparator<Event> byIdDescending = (Event e1, Event e2)->e2.getId().compareTo(e1.getId());
+        if(userLogin != null) {
+            //Find user events
+            User userPrivilege = UserManagerFactory.getUserManager().getPrivilege(User.class, userLogin);
+            switch(userPrivilege.getUserPrivilege()) {
+                case ADMIN:
+                    eventData = FXCollections.observableArrayList(eventManager.getAllEvents(new GenericType<List<Event>>(){}));
+                    break;
+                case ARTIST:
+                    //Retrieving Artist from signIn method.
+                    Artist artist = UserManagerFactory.getUserManager().getUserByLogin(Artist.class, userLogin);
+                    eventData = FXCollections.observableArrayList(artist.getEvents());
+                    break;
+                case CLUB:
+                    //Retrieving Club from signIn method.
+                    Club club = UserManagerFactory.getUserManager().getUserByLogin(Club.class, userLogin);
+                    eventData = FXCollections.observableArrayList(club.getEvents());
+                    break;
+            }       
+        } else {
+            eventData = FXCollections.observableArrayList(eventManager.getAllEvents(new GenericType<List<Event>>(){}));
+        }
+        
+        Collections.sort(eventData, byIdDescending);
         tblEvents.setItems(eventData);
     }
     
     private Boolean validateLength(String s) {
         if (s.length() == 0) {
-            lblError.setText("* Field must not be empty");
+            lblError.setText("* Field must not be empty.");
             lblError.setVisible(true);
             return false;
         } else if (s.length() > 255){
-            lblError.setText("* Must be less than 255 characters");
+            lblError.setText("* Must be less than 255 characters.");
             lblError.setVisible(true);
             return false;
         }
@@ -210,12 +266,8 @@ public class EventManagementController {
     }
     
     private Boolean validatePrice(Float price) {
-        if(price == null) {
-            lblError.setText("* Field must not be empty.");
-            lblError.setVisible(true);
-            return false;
-        } else if(price < 0) {
-            lblError.setText("* Price cannot be negative");
+        if(price < 0) {
+            lblError.setText("* Field should be a positive number.");
             lblError.setVisible(true);
             return false;
         }
@@ -241,7 +293,7 @@ public class EventManagementController {
                     lblError.setText("* Field must not be empty.");
                     lblError.setVisible(true);
                 } else {
-                    lblError.setText("* Date must have format: mm/dd/yy\nand be possible.");
+                    lblError.setText("* Date must have format: dd/mm/yy\nand be possible.");
                     lblError.setVisible(true);
                 }
                 return null;
@@ -254,7 +306,21 @@ public class EventManagementController {
         @Override
 	public Float fromString(String newPrice) {
             newPrice = newPrice.replace("€", "");
-            return super.fromString(newPrice);
+            try {                
+                Float number = super.fromString(newPrice);
+                lblError.setText("");
+                lblError.setVisible(false);
+                return number;
+            } catch (NumberFormatException ex) {
+                if(newPrice == null) {
+                    lblError.setText("* Field must not be empty.");
+                    lblError.setVisible(true);
+                } else {
+                    lblError.setText("* Field should be a positive number.");
+                    lblError.setVisible(true);
+                }
+            }
+            return null;
         }
         
 	@Override

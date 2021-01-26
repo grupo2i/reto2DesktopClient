@@ -140,6 +140,7 @@ public class LogInController {
     private void switchToClientManagementWindow() {
         try {
             LOGGER.log(Level.INFO, "Redirecting to ClientManagement window.");
+
             FXMLLoader loader = new FXMLLoader(getClass()
                     .getResource("/reto2desktopclient/view/ClientManagement.fxml"));
             Parent root = (Parent) loader.load();

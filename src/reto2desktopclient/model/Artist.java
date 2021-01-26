@@ -24,6 +24,8 @@ public class Artist extends User implements Serializable {
     private LocalDate tblLastaccess;
     private String tblStatus;
 
+    public Artist(){}
+    
     /**
      *
      * @param tblLogin
