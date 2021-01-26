@@ -5,12 +5,16 @@
  */
 package reto2desktopclient.view;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javafx.beans.Observable;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -30,14 +34,17 @@ import javafx.stage.WindowEvent;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
 import reto2desktopclient.client.ClubManagerFactory;
+import reto2desktopclient.exceptions.UnexpectedErrorException;
 import reto2desktopclient.exceptions.UserInputException;
 import reto2desktopclient.model.Club;
 import reto2desktopclient.model.UserPrivilege;
 import reto2desktopclient.model.UserStatus;
 import reto2desktopclient.security.PublicCrypt;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import reto2desktopclient.exceptions.UnexpectedErrorException;
 
@@ -46,6 +53,7 @@ import reto2desktopclient.exceptions.UnexpectedErrorException;
  * @author Ander
  */
 public class ClubProfileController {
+
     private static final Logger LOGGER = Logger.getLogger(ClubProfileController.class.getName());
 
     @FXML
@@ -66,8 +74,6 @@ public class ClubProfileController {
     private Label lblEmail;
     @FXML
     private TextField txtEmail;
-    @FXML
-    private Label lblErrorEmail;
     @FXML
     private Label lblLocation;
     @FXML
@@ -95,9 +101,18 @@ public class ClubProfileController {
     @FXML
     private Button btnSaveChanges;
     @FXML
+    private Button btnLogOut;
+    @FXML
     private ComboBox comboImage;
     @FXML
     private ImageView clubImage;
+    Image club1 = new Image("/reto2desktopclient/images/club1.jpg");
+    Image club2 = new Image("/reto2desktopclient/images/club2.jpg");
+    Image club3 = new Image("/reto2desktopclient/images/club3.jpg");
+
+    //private String[] profileImages = ""
+    
+    private ObservableList<String> imageNames = FXCollections.observableArrayList("Club 1", "Club 2", "Club 3");
 
     boolean errorLoginLenght = true;
     boolean usernameExists = true;
@@ -125,19 +140,18 @@ public class ClubProfileController {
         stage.setTitle("Club Profile");
         stage.setResizable(false);
         stage.setOnShowing(this::handleWindowShowing);
-       /* txtName.setText(clubSign.getFullName());
+        txtName.setText(clubSign.getFullName());
         txtLogin.setText(clubSign.getLogin());
         txtEmail.setText(clubSign.getEmail());
         txtLocation.setText(clubSign.getLocation());
         txtPhoneNumber.setText(clubSign.getPhoneNum());
         pwdPassword.setText(clubSign.getPassword());
-        txtBiography.setText(clubSign.getBiography());*/
+        txtBiography.setText(clubSign.getBiography());
         stage.show();
     }
 
     private void handleWindowShowing(WindowEvent event) {
         lblErrorLogin.setVisible(false);
-        lblErrorEmail.setVisible(false);
         lblErrorName.setVisible(false);
         lblErrorLocation.setVisible(false);
         lblErrorPhoneNumber.setVisible(false);
@@ -145,6 +159,7 @@ public class ClubProfileController {
         lblErrorBiography.setVisible(false);
         btnSaveChanges.setDisable(true);
         txtEmail.setText("Aqui va el mail del club");
+        txtEmail.setDisable(true);
         txtName.requestFocus();
         txtLogin.textProperty().addListener(this::handleTextLogin);
         txtName.textProperty().addListener(this::handleTextName);
@@ -152,8 +167,29 @@ public class ClubProfileController {
         txtPhoneNumber.textProperty().addListener(this::handleTextPhoneNumber);
         pwdPassword.textProperty().addListener(this::handleTextPassword);
         txtBiography.textProperty().addListener(this::handleTextBiography);
+        comboImage.setItems(imageNames);
+        comboImage.getSelectionModel().select("Club 1");
+        comboImage.getSelectionModel().selectedItemProperty().addListener(this::handleComboBoxSelectionChange);
 
         Logger.getLogger(LogInController.class.getName()).log(Level.INFO, "Showing stage...");
+    }
+
+    private void handleComboBoxSelectionChange(ObservableValue observable,
+            Object oldVaue, Object newValue) {
+        if (newValue != null) { //A item of the combobox is selected.         
+            String selectedCombo = (String) comboImage.getSelectionModel().getSelectedItem();
+            if (selectedCombo.equals("Club 1")) {
+                clubImage.setImage(club1);
+            }
+            if (selectedCombo.equals("Club 2")) {
+                clubImage.setImage(club2);
+            }
+            if (selectedCombo.equals("Club 3")) {
+                clubImage.setImage(club3);
+            }
+        } else { //There isn't any row selected.
+
+        }
     }
 
     private void handleTextLogin(Observable obs) {
@@ -177,7 +213,7 @@ public class ClubProfileController {
 
     private void handleTextName(Observable obs) {
         Integer txtNameLength = txtName.getText().trim().length();
-        Pattern patternName = Pattern.compile("^([A-Za-z]+[ ]?)+$");
+        Pattern patternName = Pattern.compile("^([A-zÀ-ú]+[ ]?)+$");
         Matcher matcherName = patternName.matcher(txtName.getText());
 
         if (txtNameLength == 0 || txtNameLength > 255 || !matcherName.matches()) {
@@ -265,7 +301,7 @@ public class ClubProfileController {
             errorPasswordLenght = true;
             lblErrorPassword.setVisible(true);
         } else {
-            errorPasswordLenght = true;
+            errorPasswordLenght = false;
             lblErrorPassword.setVisible(false);
         }
         testLabels();
@@ -286,7 +322,7 @@ public class ClubProfileController {
             errorBiographyLenght = true;
             lblErrorBiography.setVisible(true);
         } else {
-            errorBiographyLenght = true;
+            errorBiographyLenght = false;
             lblErrorBiography.setVisible(false);
         }
         testLabels();
@@ -344,6 +380,21 @@ public class ClubProfileController {
         }
     }
 
+    @FXML
+    public void handleButtonLogOut(ActionEvent event) throws UserInputException, IOException {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/LogIn.fxml"));
+            Parent root = (Parent) loader.load();
+            LogInController controller = (loader.getController());
+            controller.setStage(stage);
+            Logger.getLogger(LogInController.class.getName()).log(Level.INFO, "Logging out...");
+            controller.initStage(root);
+        } catch (ClientErrorException | IOException ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK);
+            alert.showAndWait();
+            Logger.getLogger(LogInController.class.getName()).log(Level.SEVERE, ex.getMessage());
+        }
+    }
 
     public Stage getStage() {
         return stage;

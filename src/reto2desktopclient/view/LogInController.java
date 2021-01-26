@@ -1,6 +1,7 @@
 package reto2desktopclient.view;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.Observable;
@@ -17,7 +18,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
-import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.ProcessingException;
 import reto2desktopclient.client.UserManagerFactory;
 import reto2desktopclient.exceptions.UnexpectedErrorException;
 import reto2desktopclient.model.Artist;
@@ -93,44 +95,64 @@ public class LogInController {
                     //Retrieving User from signIn method.
                     user = UserManagerFactory.getUserManager().signIn(
                             User.class, txtUsername.getText(), encodedPassword);
+                    //Updating users last access...
+                    user.setLastAccess(new Date());
+                    UserManagerFactory.getUserManager().edit(user);
                     switchToClientManagementWindow();
                     break;
                 case ARTIST:
                     //Retrieving Artist from signIn method.
                     Artist artist = UserManagerFactory.getUserManager().signIn(
                             Artist.class, txtUsername.getText(), encodedPassword);
+                    //Updating artists last access...
+                    artist.setLastAccess(new Date());
+                    UserManagerFactory.getUserManager().edit(artist);
                     switchToArtistProfileWindow();
                     break;
                 case CLUB:
                     //Retrieving Club from signIn method.
                     Club club = UserManagerFactory.getUserManager().signIn(
                             Club.class, txtUsername.getText(), encodedPassword);
+                    //Updating clubs last access...
+                    club.setLastAccess(new Date());
+                    UserManagerFactory.getUserManager().edit(club);
                     switchToClubProfileWindow();
                     break;
+                default:
+                    showErroAlert("Invalid login, only Clubs, Artists and Administrators are allowed.");
+                    break;
             }
-            
-        } catch (UnexpectedErrorException | ClientErrorException ex) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK);
-            alert.showAndWait();
+        } catch(NotAuthorizedException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage());
+            showErroAlert("User not found, incorrect login or password.");
+        } catch (UnexpectedErrorException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage());
+            showErroAlert(ex.getMessage());
+        } catch(ProcessingException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage());
+            showErroAlert("Could not process the request, please try later.");
         }
     }
     
     /**
      * Switches the scene from LogIn to AdminMainMenu.
      */
-    private void switchToClientManagementWindow() throws UnexpectedErrorException {
+    private void switchToClientManagementWindow() {
         try {
             LOGGER.log(Level.INFO, "Redirecting to ClientManagement window.");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/ClientManagement.fxml"));
+
+            FXMLLoader loader = new FXMLLoader(getClass()
+                    .getResource("/reto2desktopclient/view/ClientManagement.fxml"));
             Parent root = (Parent) loader.load();
             //Getting window controller.
-            EventManagementController controller = (loader.getController());
+            ClientManagementController controller = (loader.getController());
             controller.setStage(stage);
             //Initializing stage.
             controller.initStage(root);
         } catch (IOException ex) {
             LOGGER.log(Level.SEVERE, "Could not switch to ClientManagement window: {0}", ex.getMessage());
+            showErroAlert("Could not switch to Client Management window due to an"
+                    + " unexpected error, please try later.");
         }
       
     }
@@ -138,10 +160,11 @@ public class LogInController {
     /**
      * Switches the scene from LogIn to ArtistManagement.
      */
-    private void switchToArtistProfileWindow() throws UnexpectedErrorException {
+    private void switchToArtistProfileWindow() {
         try {
             LOGGER.log(Level.INFO, "Redirecting to ArtistManagement window.");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/ArtistManagement.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass()
+                    .getResource("/reto2desktopclient/view/ArtistManagement.fxml"));
             Parent root = (Parent) loader.load();
             //Getting window controller.
             ArtistManagementController controller = (loader.getController());
@@ -150,17 +173,19 @@ public class LogInController {
             controller.initStage(root);
         } catch (IOException ex) {
             LOGGER.log(Level.SEVERE, "Could not switch to ArtistManagement window: {0}", ex.getMessage());
-            throw new UnexpectedErrorException();
+            showErroAlert("Could not switch to Artist Management window due to an"
+                    + " unexpected error, please try later.");
         }
     }
     
     /**
      * Switches the scene from LogIn to ClubManagement.
      */
-    private void switchToClubProfileWindow() throws UnexpectedErrorException {
+    private void switchToClubProfileWindow() {
         try {
             LOGGER.log(Level.INFO, "Redirecting to ClubManagement window.");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/ClubProfile.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass()
+                    .getResource("/reto2desktopclient/view/ClubProfile.fxml"));
             Parent root = (Parent) loader.load();
             //Getting window controller.
             ClubProfileController controller = (loader.getController());
@@ -169,8 +194,20 @@ public class LogInController {
             controller.initStage(root);
         } catch (IOException ex) {
             LOGGER.log(Level.SEVERE, "Could not switch to ArtistManagement window: {0}", ex.getMessage());
-            throw new UnexpectedErrorException();
+            showErroAlert("Could not switch to Artist Management window due to an"
+                    + " unexpected error, please try later.");
         }
+    }
+    
+    /**
+     * Shows an error Alert window with the specified message.
+     * 
+     * @param errorMessage The specified message.
+     */
+    private void showErroAlert(String errorMessage) {
+        LOGGER.log(Level.INFO, "Showing Alert window with error message...");
+        Alert errorAlert = new Alert(Alert.AlertType.ERROR, errorMessage, ButtonType.OK);
+        errorAlert.show();
     }
 
     /**

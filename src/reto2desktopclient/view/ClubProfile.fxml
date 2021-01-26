@@ -9,7 +9,6 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.BorderPane?>
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="490.0" prefWidth="623.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="reto2desktopclient.view.ClubProfileController">
     <children>
@@ -19,13 +18,14 @@
             </image>
         </ImageView>
         <TextField id="txtName" fx:id="txtName" layoutX="264.0" layoutY="29.0" prefHeight="25.0" prefWidth="172.0" promptText="Write the club name" />
-        <TextArea id="txtDescription" fx:id="txtBiography" layoutX="264.0" layoutY="238.0" prefHeight="187.0" prefWidth="344.0" promptText="Write the club biography" />
-        <Button id="btnSaveChanges" fx:id="btnSaveChanges" layoutX="521.0" layoutY="451.0" mnemonicParsing="false" text="Save changes" />
-        <ComboBox id="imgCombo" fx:id="comboImage" layoutX="35.0" layoutY="145.0" prefHeight="25.0" prefWidth="130.0" />
+        <TextField id="txtUsername" fx:id="txtLogin" layoutX="264.0" layoutY="65.0" prefHeight="25.0" prefWidth="172.0" promptText="Write the club username" />
         <TextField id="txtEmail" fx:id="txtEmail" layoutX="264.0" layoutY="99.0" prefHeight="25.0" prefWidth="172.0" promptText="Write the club email" />
         <TextField id="txtLocation" fx:id="txtLocation" layoutX="263.0" layoutY="133.0" prefHeight="25.0" prefWidth="172.0" promptText="Write the club location" />
         <TextField id="txtPhoneNumber" fx:id="txtPhoneNumber" layoutX="264.0" layoutY="167.0" prefHeight="25.0" prefWidth="172.0" promptText="Write the club phone number" />
-        <TextField id="txtUsername" fx:id="txtLogin" layoutX="264.0" layoutY="65.0" prefHeight="25.0" prefWidth="172.0" promptText="Write the club username" />
+        <PasswordField fx:id="pwdPassword" layoutX="265.0" layoutY="199.0" prefHeight="25.0" prefWidth="172.0" />
+        <TextArea id="txtDescription" fx:id="txtBiography" layoutX="264.0" layoutY="238.0" prefHeight="187.0" prefWidth="344.0" promptText="Write the club biography" />
+        <Button id="btnSaveChanges" fx:id="btnSaveChanges" layoutX="521.0" layoutY="451.0" onAction="#handleButtonSaveChanges" mnemonicParsing="false" text="Save changes" />
+        <ComboBox id="imgCombo" fx:id="comboImage" layoutX="35.0" layoutY="145.0" prefHeight="25.0" prefWidth="130.0" />
         <Label layoutX="198.0" layoutY="33.0" text="Club name:" />
         <Label layoutX="198.0" layoutY="69.0" text="Club login:" />
         <Label layoutX="197.0" layoutY="103.0" text="Club email:" />
@@ -34,17 +34,12 @@
         <Label layoutX="178.0" layoutY="203.0" text="Club password:" />
         <Label layoutX="210.0" layoutY="237.0" text="Club bio:" />
         <Label fx:id="lblErrorName" layoutX="442.0" layoutY="33.0" text="* error" textFill="RED" />
-        <Label fx:id="lblErrorLogin" layoutX="442.0" layoutY="69.0" text="* error" textFill="RED" />
-        <Label fx:id="lblErrorEmail" layoutX="442.0" layoutY="103.0" text="* error" textFill="RED" />
+        <Label fx:id="lblErrorLogin" layoutX="442.0" layoutY="69.0" text="* error" textFill="RED" />       
         <Label fx:id="lblErrorLocation" layoutX="441.0" layoutY="137.0" text="* error" textFill="RED" />
         <Label fx:id="lblErrorPhoneNumber" layoutX="442.0" layoutY="171.0" text="* error" textFill="RED" />
         <Label fx:id="lblErrorPassword" layoutX="442.0" layoutY="203.0" text="* error" textFill="RED" />
         <Label fx:id="lblErrorBiography" layoutX="265.0" layoutY="425.0" text="* error" textFill="RED" />
-        <PasswordField fx:id="pwdPassword" layoutX="265.0" layoutY="199.0" prefHeight="25.0" prefWidth="172.0" />
-        <BorderPane prefHeight="1" prefWidth="1">
-            <top>
-                <fx:include fx:id="adminMenu" source="AdminMenu.fxml" />
-            </top> 
-        </BorderPane>
+      <Button fx:id="btnLogOut" layoutX="15.0" layoutY="451.0" onAction="#handleButtonLogOut" mnemonicParsing="false" text="Log Out" />
+        
     </children>
 </Pane>

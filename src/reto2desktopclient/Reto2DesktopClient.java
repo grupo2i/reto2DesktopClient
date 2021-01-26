@@ -19,7 +19,6 @@ public class Reto2DesktopClient extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/reto2desktopclient/view/LogIn.fxml"));
         Parent root = (Parent) loader.load();
         LogInController controller = (loader.getController());
-        //ClubManagementController controller = (loader.getController());
         primaryStage.setResizable(Boolean.FALSE);
         controller.setStage(primaryStage);
         controller.initStage(root);

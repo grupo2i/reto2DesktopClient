@@ -35,7 +35,12 @@ public class Artist extends User implements Serializable {
      * @param musicGenre
      * @param tblStatus
      */
-    public Artist(String tblLogin, String tbEmail, String tblName, LocalDate tblLastaccess, String musicGenre, String tblStatus) {
+    public Artist(String tblLogin, 
+            String tbEmail,
+            String tblName,
+            LocalDate tblLastaccess,
+            String musicGenre,
+            String tblStatus) {
         this.tblLogin = tblLogin;
         this.tbEmail = tbEmail;
         this.tblName = tblName;
@@ -128,14 +133,6 @@ public class Artist extends User implements Serializable {
 
     public void setEvents(Set<Event> events) {
         this.events = events;
-    }
-
-    /**
-     *
-     * @param musicGenre
-     */
-    public void setMusicGenre(String musicGenre) {
-        this.musicGenre = musicGenre;
     }
 
     /**
