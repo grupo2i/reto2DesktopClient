@@ -32,7 +32,11 @@ import javafx.util.converter.FloatStringConverter;
 import javax.ws.rs.core.GenericType;
 import reto2desktopclient.client.EventManager;
 import reto2desktopclient.client.EventManagerFactory;
+import reto2desktopclient.client.UserManagerFactory;
+import reto2desktopclient.model.Artist;
+import reto2desktopclient.model.Club;
 import reto2desktopclient.model.Event;
+import reto2desktopclient.model.User;
 
 /**
  * TODO: Check price and date conditions for lblErrors
@@ -220,8 +224,29 @@ public class EventManagementController {
     }
     
     private void refreshData() {
-        eventData = FXCollections.observableArrayList(eventManager.getAllEvents(new GenericType<List<Event>>(){}));
         Comparator<Event> byIdDescending = (Event e1, Event e2)->e2.getId().compareTo(e1.getId());
+        if(userLogin != null) {
+            //Find user events
+            User userPrivilege = UserManagerFactory.getUserManager().getPrivilege(User.class, userLogin);
+            switch(userPrivilege.getUserPrivilege()) {
+                case ADMIN:
+                    eventData = FXCollections.observableArrayList(eventManager.getAllEvents(new GenericType<List<Event>>(){}));
+                    break;
+                case ARTIST:
+                    //Retrieving Artist from signIn method.
+                    Artist artist = UserManagerFactory.getUserManager().getUserByLogin(Artist.class, userLogin);
+                    eventData = FXCollections.observableArrayList(artist.getEvents());
+                    break;
+                case CLUB:
+                    //Retrieving Club from signIn method.
+                    Club club = UserManagerFactory.getUserManager().getUserByLogin(Club.class, userLogin);
+                    eventData = FXCollections.observableArrayList(club.getEvents());
+                    break;
+            }       
+        } else {
+            eventData = FXCollections.observableArrayList(eventManager.getAllEvents(new GenericType<List<Event>>(){}));
+        }
+        
         Collections.sort(eventData, byIdDescending);
         tblEvents.setItems(eventData);
     }
