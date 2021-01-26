@@ -1,18 +1,26 @@
 package reto2desktopclient.view;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javafx.beans.Observable;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Separator;
@@ -25,6 +33,11 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.core.GenericType;
+import reto2desktopclient.client.ArtistManagerFactory;
+import reto2desktopclient.exceptions.UnexpectedErrorException;
+import reto2desktopclient.exceptions.UserInputException;
 import reto2desktopclient.model.Artist;
 
 /**
@@ -60,7 +73,7 @@ public class ArtistManagementController {
     @FXML
     private Label lblUsernameError1;
     @FXML
-    private TableView<Artist> tbData;
+    private TableView<Artist> tableArtist;
     @FXML
     public TableColumn<Artist, String> tblLogin;
     @FXML
@@ -77,41 +90,156 @@ public class ArtistManagementController {
     public TableColumn<Artist, String> tblStatus;
     @FXML
     public TableColumn<Artist, LocalDate> tblLastaccess;
+    @FXML
     ToggleGroup group = new ToggleGroup();
+    private ObservableList artistData;
+    @FXML
+    private AdminMenuController adminMenuController;
 
     boolean errorEmailLenght = true;
     boolean errorEmailPattern = true;
     boolean errorTxtUserNameArtist = true;
     boolean errorTxtFullNameArtist = true;
+    boolean tableIsSelected = false;
 
+    /**
+     *
+     *
+     * @param root
+     */
     public void initStage(Parent root
     ) {
         //Initialize the stage
         Scene scene = new Scene(root);
+
         stage.setScene(scene);
         stage.setTitle("Artist Management");
-        Logger.getLogger(LogInController.class.getName()).log(Level.INFO, "Initializing stage...");
+        stage.setResizable(false);
+        stage.show();
+        adminMenuController.setStage(stage);
+        initializebottonGroup();
+        enableButtons();
+        initializeCheckBox();
 
+        lblNameError1.setVisible(false);
+        lblEmailError1.setVisible(false);
+        lblUsernameError1.setVisible(false);
         txtEmailArtist.textProperty().addListener(this::handletxtEmailArtist);
         txtFullNameArtist.textProperty().addListener(this::handleTextFullNameArtist);
         txtUserNameArtist.textProperty().addListener(this::handletxtUserNameArtist);
 
-        btnAddArtist.setDisable(true);
-        btnDeleteArtist.setDisable(true);
-        btnUpdateArtist.setDisable(true);
+        //Stablishing cell value factories on table columns
+        tblLogin.setCellValueFactory(new PropertyValueFactory<>("login"));
+        tbEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+        tblName.setCellValueFactory(new PropertyValueFactory<>("fullName"));
+        tblLastaccess.setCellValueFactory(new PropertyValueFactory<>("lastAccess"));
+        musicGenre.setCellValueFactory(new PropertyValueFactory<>("MusicGenre"));
+        tblStatus.setCellValueFactory(new PropertyValueFactory<>("userStatus"));
+        //Creating an Artist observable List with all registered artist.
+        artistData = FXCollections.observableList(ArtistManagerFactory
+                .getArtistManager().getAllArtists(new GenericType<List<Artist>>() {
+                }));
+        //Setting the table model to the observable list above.
+        tableArtist.setItems(artistData);
+        //Setting table selection listener.
+        tableArtist.getSelectionModel().selectedItemProperty()
+                .addListener(this::handleArtistTableSelectionChange);
 
-        initializebottonGroup();
-        lblNameError1.setVisible(false);
-        lblEmailError1.setVisible(false);
-        lblUsernameError1.setVisible(false);
-        //Calls the ChoiceBox function
-        initializeCheckBox();
-        initialize();
-        datePicker.setValue(LocalDate.now());
-        //Shows the stage
-        stage.show();
-        LOGGER.log(Level.INFO, "Successfully switched to Artist window.");
+        Logger.getLogger(LogInController.class.getName()).log(Level.INFO, "Showing stage...");
     }
+
+    /**
+     *
+     * @param event
+     * @throws UserInputException
+     */
+    @FXML
+    public void handleButtonDelete(ActionEvent event) throws UserInputException {
+        try {
+            //Get selected club data from table view model
+            Artist selectedArtist = ((Artist) tableArtist.getSelectionModel().getSelectedItem());
+            //Ask user for confirmation on delete
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                    "Are you sure you want to delete the selected Artist?\n"
+                    + "This option can't be reversed.",
+                    ButtonType.OK, ButtonType.CANCEL);
+            Optional<ButtonType> result = alert.showAndWait();
+            //If OK to deletion
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                //delete user from server side
+                ArtistManagerFactory.getArtistManager().remove(selectedArtist.getId().toString());
+                //clears editing fields
+                resetFieldsAndLabels();
+                //Clear selection and refresh table view 
+                tableArtist.getSelectionModel().clearSelection();
+                artistData = FXCollections.observableList(ArtistManagerFactory
+                        .getArtistManager().getAllArtists(new GenericType<List<Artist>>() {
+                        }));
+                tableArtist.setItems(artistData);
+                LOGGER.log(Level.INFO, "Artist was deleted succesfuly");
+            }
+        } catch (ClientErrorException ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK);
+            alert.showAndWait();
+            Logger.getLogger(LogInController.class.getName()).log(Level.SEVERE, ex.getMessage());
+        }
+    }
+
+    /**
+     *
+     * @param event
+     * @throws UserInputException
+     */
+    @FXML
+    public void handleButtonUpdate(ActionEvent event) throws UserInputException {
+        Artist selectedArtist = ((Artist) tableArtist.getSelectionModel().getSelectedItem());
+        handletxtUserNameArtist(artistData);
+        handletxtEmailArtist(artistData);
+        handleTextFullNameArtist(artistData);
+
+        selectedArtist.setFullName(txtFullNameArtist.getText());
+        selectedArtist.setEmail(txtEmailArtist.getText());
+        selectedArtist.setLogin(txtUserNameArtist.getText());
+        ArtistManagerFactory.getArtistManager().edit(selectedArtist);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Stage getStage() {
+        return stage;
+    }
+
+    /**
+     *
+     * @param primaryStage
+     */
+    public void setStage(Stage primaryStage) {
+        stage = primaryStage;
+    }
+
+    private void handleArtistTableSelectionChange(ObservableValue observable,
+            Object oldVaue, Object newValue) {
+        tableIsSelected = true;
+        if (newValue != null) {//A row of the table is selected.
+            //Enable See Events, delete and update buttons.
+            enableButtons();
+            Artist selectedArtist = ((Artist) tableArtist.getSelectionModel().getSelectedItem());
+            txtEmailArtist.setText(selectedArtist.getEmail());
+            txtFullNameArtist.setText(selectedArtist.getFullName());
+            txtUserNameArtist.setText(selectedArtist.getLogin());
+            choiceBox.setValue(selectedArtist.getMusicGenre());
+            group.setUserData(selectedArtist.getUserStatus());
+            tableIsSelected = true;
+        } else { //There isn't any row selected.
+            //Disable all buttons.
+            disableButtons();
+            resetFieldsAndLabels();
+            tableIsSelected = false;
+        }
+    }
+
     /**
      * Check that the full name pattern is correct
      *
@@ -171,6 +299,9 @@ public class ArtistManagementController {
         choiceBox.setValue("POP");
     }
 
+    /**
+     *
+     */
     @FXML
     public void initializebottonGroup() {
         btnD.setToggleGroup(group);
@@ -202,68 +333,47 @@ public class ArtistManagementController {
 
     }
 
+    /**
+     *
+     */
     public void enableButtons() {
         btnAddArtist.setDisable(false);
         btnDeleteArtist.setDisable(false);
         btnUpdateArtist.setDisable(false);
     }
 
+    /**
+     *
+     */
     public void disableButtons() {
         btnAddArtist.setDisable(true);
         btnDeleteArtist.setDisable(true);
         btnUpdateArtist.setDisable(true);
     }
 
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
-
-    public Stage getStage() {
-        return stage;
-    }
-
-    /**
-     *
-     */
-    public void initialize() {
-        tblLogin.setCellValueFactory(new PropertyValueFactory<>("tblLogin"));
-        tbEmail.setCellValueFactory(new PropertyValueFactory<>("tbEmail"));
-        tblName.setCellValueFactory(new PropertyValueFactory<>("tblName"));
-        tblLastaccess.setCellValueFactory(new PropertyValueFactory<>("tblLastaccess"));
-        musicGenre.setCellValueFactory(new PropertyValueFactory<>("musicGenre"));
-        tblStatus.setCellValueFactory(new PropertyValueFactory<>("tblStatus"));
-        //add your data to the table here.
-        tbData.setItems(tableModel);
-    }
-
-    // add your data here from any source 
-    private ObservableList<Artist> tableModel = FXCollections.observableArrayList();
-
     /**
      *
      * @param e
+     * @throws reto2desktopclient.exceptions.UnexpectedErrorException
      */
-    public void handle(ActionEvent e) {
-        String status;
-        if (btnE.isSelected()) {
-            status = "ENABLED";
-        } else {
-            status = "DISABLED";
-        }
-        Artist artist = new Artist(
-                txtUserNameArtist.getText(),
-                txtEmailArtist.getText(),
-                txtFullNameArtist.getText(),
-                datePicker.getValue(),
-                choiceBox.getValue().toString(),
-                status);
+    public void handleButtonAdd(ActionEvent e) throws UnexpectedErrorException {
+        Artist artist = new Artist();
+        artist.setFullName(txtFullNameArtist.getText());
+        artist.setEmail(txtEmailArtist.getText());
+        artist.setLogin(txtUserNameArtist.getText());
+        ArtistManagerFactory.getArtistManager().create(artist);
+        artistData = FXCollections.observableList(ArtistManagerFactory
+                .getArtistManager().getAllArtists(new GenericType<List<Artist>>() {
+                }));
+        tableArtist.setItems(artistData);
+        LOGGER.log(Level.INFO, "Artist was added succesfuly");
+        resetFieldsAndLabels();
+    }
 
-        tableModel.add(artist);
-
+    private void resetFieldsAndLabels() {
         txtFullNameArtist.clear();
         txtUserNameArtist.clear();
         txtEmailArtist.clear();
-
     }
 
 }
