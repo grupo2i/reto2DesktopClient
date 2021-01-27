@@ -116,7 +116,7 @@ public class LogInController {
                     //Updating clubs last access...
                     club.setLastAccess(new Date());
                     UserManagerFactory.getUserManager().edit(club);
-                    switchToClubProfileWindow();
+                    switchToClubProfileWindow(club);
                     break;
                 default:
                     showErroAlert("Invalid login, only Clubs, Artists and Administrators are allowed.");
@@ -181,7 +181,7 @@ public class LogInController {
     /**
      * Switches the scene from LogIn to ClubManagement.
      */
-    private void switchToClubProfileWindow() {
+    private void switchToClubProfileWindow(Club club) {
         try {
             LOGGER.log(Level.INFO, "Redirecting to ClubManagement window.");
             FXMLLoader loader = new FXMLLoader(getClass()
@@ -190,6 +190,7 @@ public class LogInController {
             //Getting window controller.
             ClubProfileController controller = (loader.getController());
             controller.setStage(stage);
+            controller.setClubSign(club);
             //Initializing stage.
             controller.initStage(root);
         } catch (IOException ex) {
