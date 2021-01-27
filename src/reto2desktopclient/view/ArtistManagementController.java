@@ -1,9 +1,6 @@
 package reto2desktopclient.view;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -118,7 +115,7 @@ public class ArtistManagementController {
         stage.show();
         adminMenuController.setStage(stage);
         initializebottonGroup();
-        enableButtons();
+        disableButtons();
         initializeCheckBox();
 
         lblNameError1.setVisible(false);
@@ -156,6 +153,7 @@ public class ArtistManagementController {
     @FXML
     public void handleButtonDelete(ActionEvent event) throws UserInputException {
         try {
+
             //Get selected club data from table view model
             Artist selectedArtist = ((Artist) tableArtist.getSelectionModel().getSelectedItem());
             //Ask user for confirmation on delete
@@ -163,8 +161,10 @@ public class ArtistManagementController {
                     "Are you sure you want to delete the selected Artist?\n"
                     + "This option can't be reversed.",
                     ButtonType.OK, ButtonType.CANCEL);
-            Optional<ButtonType> result = alert.showAndWait();
-            //If OK to deletion
+            Optional<ButtonType> result;
+            result = alert.showAndWait();
+
+            //If OK to seletion
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 //delete user from server side
                 ArtistManagerFactory.getArtistManager().remove(selectedArtist.getId().toString());
@@ -177,6 +177,8 @@ public class ArtistManagementController {
                         }));
                 tableArtist.setItems(artistData);
                 LOGGER.log(Level.INFO, "Artist was deleted succesfuly");
+                enableButtons();
+                btnDeleteArtist.setDisable(true);
             }
         } catch (ClientErrorException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK);
@@ -196,7 +198,8 @@ public class ArtistManagementController {
         handletxtUserNameArtist(artistData);
         handletxtEmailArtist(artistData);
         handleTextFullNameArtist(artistData);
-
+        lblUsernameError1.setVisible(true);
+        lblEmailError1.setVisible(true);
         selectedArtist.setFullName(txtFullNameArtist.getText());
         selectedArtist.setEmail(txtEmailArtist.getText());
         selectedArtist.setLogin(txtUserNameArtist.getText());
@@ -224,7 +227,7 @@ public class ArtistManagementController {
         tableIsSelected = true;
         if (newValue != null) {//A row of the table is selected.
             //Enable See Events, delete and update buttons.
-            enableButtons();
+
             Artist selectedArtist = ((Artist) tableArtist.getSelectionModel().getSelectedItem());
             txtEmailArtist.setText(selectedArtist.getEmail());
             txtFullNameArtist.setText(selectedArtist.getFullName());
@@ -232,6 +235,10 @@ public class ArtistManagementController {
             choiceBox.setValue(selectedArtist.getMusicGenre());
             group.setUserData(selectedArtist.getUserStatus());
             tableIsSelected = true;
+            btnDeleteArtist.setDisable(false);
+            btnUpdateArtist.setDisable(false);
+            btnAddArtist.setDisable(true);
+
         } else { //There isn't any row selected.
             //Disable all buttons.
             disableButtons();
@@ -251,23 +258,24 @@ public class ArtistManagementController {
         Matcher matcherFullName = patternFullName.matcher(txtFullNameArtist.getText());
         //If there is any error...
         if (txtFullNameLength == 0 || txtFullNameLength > 255 || !matcherFullName.matches()) {
-            if (!matcherFullName.matches()) {
-                disableButtons();
-                lblNameError1.setVisible(true);
-            }
+
             //Sets the alert message when the fiel is empty.
             if (txtFullNameLength == 0) {
+
+                lblNameError1.setText("* Field must not be empty");
                 disableButtons();
-                lblNameError1.setVisible(true);
             } //Sets the alert message when the field is longer than 255 characters.
             else if (txtFullNameLength > 255) {
                 disableButtons();
-                lblNameError1.setVisible(true);
+                lblNameError1.setText("* Must be < than 255");
+            } else if (!matcherFullName.matches()) {
+                disableButtons();
+                lblNameError1.setText("* Must only contain letters");
             }
+            lblNameError1.setVisible(true);
         } else {
             enableButtons();
             lblNameError1.setVisible(false);
-
         }
     }
 
@@ -281,10 +289,10 @@ public class ArtistManagementController {
         //if username =0 or <255= error
         if (usLenght == 0 || usLenght > 255) {
             disableButtons();
-            lblUsernameError1.setVisible(true);
+            lblUsernameError1.setText("* Field must not be empty");
         } else {
             enableButtons();
-            lblUsernameError1.setVisible(false);
+            lblUsernameError1.setText("* Must be < than 255");
         }
     }
 
@@ -320,15 +328,25 @@ public class ArtistManagementController {
                 + "[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
         Matcher matcherEmail = patternEmail.matcher(txtEmailArtist.getText());
 
-        if (txtEmailLength == 0 || txtEmailLength > 255) {
-            disableButtons();
+        if (txtEmailLength == 0 || txtEmailLength > 255 || !matcherEmail.matches()) {
+            if (txtEmailLength == 0) {
+                lblEmailError1.setText("* Field must not be empty");
+                errorEmailLenght = false;
+            } //Sets the error message when the field is longer than 255 characters.
+            else if (txtEmailLength > 255) {
+                lblEmailError1.setText("* Must be < than 255");
+                errorEmailLenght = false;
+            } //Sets the error message when the field does not match the pattern.
+            else if (!matcherEmail.matches()) {
+                lblEmailError1.setText("* Must match: a@a.aa");
+                errorEmailPattern = true;
+            }
             lblEmailError1.setVisible(true);
-        } else if (!matcherEmail.matches()) {
-            disableButtons();
-            lblEmailError1.setVisible(true);
+            errorEmailPattern = true;
         } else {
-            enableButtons();
+            errorEmailLenght = false;
             lblEmailError1.setVisible(false);
+            errorEmailPattern = false;
         }
 
     }
