@@ -35,11 +35,15 @@ import javafx.stage.Stage;
 import reto2desktopclient.exceptions.UnexpectedErrorException;
 
 /**
+ * Controller for the ClubProfile window.
  *
  * @author Ander
  */
 public class ClubProfileController {
 
+    /**
+     * Logger used to leave traces.
+     */
     private static final Logger LOGGER = Logger.getLogger(ClubProfileController.class.getName());
 
     @FXML
@@ -98,16 +102,25 @@ public class ClubProfileController {
     boolean errorPhoneNumberPattern = false;
     boolean errorPasswordLenght = false;
     boolean errorBiographyLenght = false;
+
+    //Club that has logged in.
     private Club clubSign;
 
+    //Gets the club that has logged in.
     public Club getClubSign() {
         return clubSign;
     }
 
+    //Sets the club that has logged in.
     public void setClubSign(Club clubSign) {
         this.clubSign = clubSign;
     }
 
+    /**
+     * Initializes the stage of the window.
+     *
+     * @param root Parent of all nodes in the scene graph.
+     */
     public void initStage(Parent root) {
         Scene scene = new Scene(root);
         Logger.getLogger(ClubManagementController.class.getName()).log(Level.INFO, "Initializing stage...");
@@ -125,6 +138,11 @@ public class ClubProfileController {
         stage.show();
     }
 
+    /**
+     * Handles the showing event of the stage by initializing window elements.
+     *
+     * @param event Showing event of the stage.
+     */
     private void handleWindowShowing(WindowEvent event) {
         lblErrorLogin.setVisible(false);
         lblErrorName.setVisible(false);
@@ -145,6 +163,11 @@ public class ClubProfileController {
         Logger.getLogger(LogInController.class.getName()).log(Level.INFO, "Showing stage...");
     }
 
+    /**
+     * Checks if login textfield is valid (lenght).
+     *
+     * @param obs
+     */
     private void handleTextLogin(Observable obs) {
         Integer usLenght = txtLogin.getText().trim().length();
         //if username =0 or <255= error
@@ -164,6 +187,11 @@ public class ClubProfileController {
         testLabels();
     }
 
+    /**
+     * Checks if name textfield is valid (lenght & pattern).
+     *
+     * @param obs
+     */
     private void handleTextName(Observable obs) {
         lblErrorName.setText("");
         Integer txtNameLength = txtName.getText().trim().length();
@@ -193,6 +221,11 @@ public class ClubProfileController {
         testLabels();
     }
 
+    /**
+     * Checks if location textfield is valid (lenght).
+     *
+     * @param obs
+     */
     private void handleTextLocation(Observable obs) {
         Integer txtLocationLength = txtLocation.getText().trim().length();
         if (txtLocationLength == 0 || txtLocationLength > 255) {
@@ -214,6 +247,11 @@ public class ClubProfileController {
         testLabels();
     }
 
+    /**
+     * Checks if phone number textfield is valid (lenght & pattern).
+     *
+     * @param obs
+     */
     private void handleTextPhoneNumber(Observable obs) {
         Integer txtPhoneNumberLenght = txtPhoneNumber.getText().trim().length();
         Pattern patternPhoneNumber = Pattern.compile("[0-9]+");
@@ -240,6 +278,11 @@ public class ClubProfileController {
         testLabels();
     }
 
+    /**
+     * Checks if password field is valid (lenght).
+     *
+     * @param obs
+     */
     private void handleTextPassword(Observable obs) {
         Integer pwdPasswordLength = pwdPassword.getText().trim().length();
 
@@ -261,6 +304,11 @@ public class ClubProfileController {
         testLabels();
     }
 
+    /**
+     * Checks if biography textarea is valid (lenght).
+     *
+     * @param obs
+     */
     private void handleTextBiography(Observable obs) {
         Integer txtBiographyLength = txtBiography.getText().trim().length();
 
@@ -293,6 +341,14 @@ public class ClubProfileController {
         }
     }
 
+    /**
+     * After all validations updates club profile and shows an alert
+     * confirmation.
+     *
+     * @param event
+     * @throws UserInputException and ClientErrorException in case something
+     * goes wrong.
+     */
     @FXML
     public void handleButtonSaveChanges(ActionEvent event) throws UserInputException {
         Integer encontradoUsername = 0;
@@ -302,7 +358,7 @@ public class ClubProfileController {
             List<Club> clubfind = ClubManagerFactory.getClubManager()
                     .getAllClubs(new GenericType<List<Club>>() {
                     });
-            if (!clubSign.getLogin().equals(txtLogin)) {
+            if (!clubSign.getLogin().equals(txtLogin.getText().toString())) {
                 for (int x = 0; x < clubfind.size(); x++) {
                     if (clubfind.get(x).getLogin().equals(txtLogin.getText())) {
                         usernameExists = true;
@@ -321,13 +377,16 @@ public class ClubProfileController {
                 club.setLogin(txtLogin.getText());
             }
             String encodedPassword = PublicCrypt.encode(pwdPassword.getText());
-            club.setPassword(encodedPassword);
-            club.setFullName(txtName.getText());
-            club.setLocation(txtLocation.getText());
-            club.setPhoneNum(txtPhoneNumber.getText());
-            club.setBiography(txtBiography.getText().toString());
-            ClubManagerFactory.getClubManager().edit(club);
+            clubSign.setPassword(encodedPassword);
+            clubSign.setFullName(txtName.getText());
+            clubSign.setLocation(txtLocation.getText());
+            clubSign.setPhoneNum(txtPhoneNumber.getText());
+            clubSign.setBiography(txtBiography.getText().toString());
+            ClubManagerFactory.getClubManager().edit(clubSign);
             LOGGER.log(Level.INFO, "Club profile was updated succesfuly");
+            Alert alert;
+            alert = new Alert(Alert.AlertType.INFORMATION, "Profile was updated succesfuly!", ButtonType.OK);
+            alert.showAndWait();
         } catch (ClientErrorException | UnexpectedErrorException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK);
             alert.showAndWait();
@@ -335,6 +394,12 @@ public class ClubProfileController {
         }
     }
 
+    /**
+     * Switches to log in window.
+     *
+     * @param event
+     * @throws ClientErrorException or IOException in case something goes wrong.
+     */
     @FXML
     public void handleButtonLogOut(ActionEvent event) throws UserInputException, IOException {
         try {
