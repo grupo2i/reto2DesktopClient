@@ -104,6 +104,6 @@ public class Club extends User implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Club[ id=" + id + " ]";
+        return getLogin();
     }
 }
