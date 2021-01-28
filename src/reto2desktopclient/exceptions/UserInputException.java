@@ -13,10 +13,7 @@ import java.util.logging.Logger;
  * @author Ander
  */
 public class UserInputException extends Exception{
-   /* public UserInputException(String username){
-        super(username + "' is already registered.");
-        Logger.getLogger(UnexpectedErrorException.class.getName()).log(Level.SEVERE, this.getMessage());
-    }*/
+
         private static final String DEFAULT_MESSAGE
             = "An unexpected error occured, please try later.";
 

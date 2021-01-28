@@ -12,39 +12,25 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javafx.beans.Observable;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
-import javafx.scene.image.ImageView;
-import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
 import reto2desktopclient.client.ClubManagerFactory;
-import reto2desktopclient.exceptions.UnexpectedErrorException;
 import reto2desktopclient.exceptions.UserInputException;
 import reto2desktopclient.model.Club;
-import reto2desktopclient.model.UserPrivilege;
-import reto2desktopclient.model.UserStatus;
 import reto2desktopclient.security.PublicCrypt;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import reto2desktopclient.exceptions.UnexpectedErrorException;
 
@@ -102,27 +88,16 @@ public class ClubProfileController {
     private Button btnSaveChanges;
     @FXML
     private Button btnLogOut;
-    @FXML
-    private ComboBox comboImage;
-    @FXML
-    private ImageView clubImage;
-    Image club1 = new Image("/reto2desktopclient/images/club1.jpg");
-    Image club2 = new Image("/reto2desktopclient/images/club2.jpg");
-    Image club3 = new Image("/reto2desktopclient/images/club3.jpg");
 
-    //private String[] profileImages = ""
-    
-    private ObservableList<String> imageNames = FXCollections.observableArrayList("Club 1", "Club 2", "Club 3");
-
-    boolean errorLoginLenght = true;
-    boolean usernameExists = true;
-    boolean errorNameLenght = true;
-    boolean errorNamePattern = true;
-    boolean errorLocationLenght = true;
-    boolean errorPhoneNumberLenght = true;
-    boolean errorPhoneNumberPattern = true;
-    boolean errorPasswordLenght = true;
-    boolean errorBiographyLenght = true;
+    boolean errorLoginLenght = false;
+    boolean usernameExists = false;
+    boolean errorNameLenght = false;
+    boolean errorNamePattern = false;
+    boolean errorLocationLenght = false;
+    boolean errorPhoneNumberLenght = false;
+    boolean errorPhoneNumberPattern = false;
+    boolean errorPasswordLenght = false;
+    boolean errorBiographyLenght = false;
     private Club clubSign;
 
     public Club getClubSign() {
@@ -139,14 +114,14 @@ public class ClubProfileController {
         stage.setScene(scene);
         stage.setTitle("Club Profile");
         stage.setResizable(false);
-        stage.setOnShowing(this::handleWindowShowing);
         txtName.setText(clubSign.getFullName());
         txtLogin.setText(clubSign.getLogin());
         txtEmail.setText(clubSign.getEmail());
         txtLocation.setText(clubSign.getLocation());
         txtPhoneNumber.setText(clubSign.getPhoneNum());
-        pwdPassword.setText(clubSign.getPassword());
         txtBiography.setText(clubSign.getBiography());
+        stage.setOnShowing(this::handleWindowShowing);
+        stage.hide();
         stage.show();
     }
 
@@ -158,7 +133,6 @@ public class ClubProfileController {
         lblErrorPassword.setVisible(false);
         lblErrorBiography.setVisible(false);
         btnSaveChanges.setDisable(true);
-        txtEmail.setText("Aqui va el mail del club");
         txtEmail.setDisable(true);
         txtName.requestFocus();
         txtLogin.textProperty().addListener(this::handleTextLogin);
@@ -167,29 +141,8 @@ public class ClubProfileController {
         txtPhoneNumber.textProperty().addListener(this::handleTextPhoneNumber);
         pwdPassword.textProperty().addListener(this::handleTextPassword);
         txtBiography.textProperty().addListener(this::handleTextBiography);
-        comboImage.setItems(imageNames);
-        comboImage.getSelectionModel().select("Club 1");
-        comboImage.getSelectionModel().selectedItemProperty().addListener(this::handleComboBoxSelectionChange);
 
         Logger.getLogger(LogInController.class.getName()).log(Level.INFO, "Showing stage...");
-    }
-
-    private void handleComboBoxSelectionChange(ObservableValue observable,
-            Object oldVaue, Object newValue) {
-        if (newValue != null) { //A item of the combobox is selected.         
-            String selectedCombo = (String) comboImage.getSelectionModel().getSelectedItem();
-            if (selectedCombo.equals("Club 1")) {
-                clubImage.setImage(club1);
-            }
-            if (selectedCombo.equals("Club 2")) {
-                clubImage.setImage(club2);
-            }
-            if (selectedCombo.equals("Club 3")) {
-                clubImage.setImage(club3);
-            }
-        } else { //There isn't any row selected.
-
-        }
     }
 
     private void handleTextLogin(Observable obs) {
@@ -212,6 +165,7 @@ public class ClubProfileController {
     }
 
     private void handleTextName(Observable obs) {
+        lblErrorName.setText("");
         Integer txtNameLength = txtName.getText().trim().length();
         Pattern patternName = Pattern.compile("^([A-zÀ-ú]+[ ]?)+$");
         Matcher matcherName = patternName.matcher(txtName.getText());
@@ -342,20 +296,21 @@ public class ClubProfileController {
     @FXML
     public void handleButtonSaveChanges(ActionEvent event) throws UserInputException {
         Integer encontradoUsername = 0;
-
+        usernameExists = false;
         try {
             Club club = new Club();
             List<Club> clubfind = ClubManagerFactory.getClubManager()
                     .getAllClubs(new GenericType<List<Club>>() {
                     });
-
-            for (int x = 0; x < clubfind.size(); x++) {
-                if (clubfind.get(x).getLogin().equals(txtLogin.getText())) {
-                    usernameExists = true;
-                    encontradoUsername = x;
-                    break;
-                } else {
-                    usernameExists = false;
+            if (!clubSign.getLogin().equals(txtLogin)) {
+                for (int x = 0; x < clubfind.size(); x++) {
+                    if (clubfind.get(x).getLogin().equals(txtLogin.getText())) {
+                        usernameExists = true;
+                        encontradoUsername = x;
+                        break;
+                    } else {
+                        usernameExists = false;
+                    }
                 }
             }
             if (usernameExists) {
