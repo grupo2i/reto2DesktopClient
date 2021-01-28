@@ -5,6 +5,7 @@
  */
 package reto2desktopclient.view;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -24,14 +25,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
 import javafx.util.converter.DateStringConverter;
 import javafx.util.converter.FloatStringConverter;
 import javax.ws.rs.core.GenericType;
-import reto2desktopclient.client.ArtistManagerFactory;
-import reto2desktopclient.client.ClientManagerFactory;
 import reto2desktopclient.client.ClubManagerFactory;
 import reto2desktopclient.client.EventManager;
 import reto2desktopclient.client.EventManagerFactory;
@@ -70,7 +70,9 @@ public class EventManagementController {
     private TableColumn<Event, Float> colPrice;
     @FXML
     private TableColumn<Event, String> colDescription;
-
+    @FXML
+    private TableColumn<Event, String> colClub;
+    
     private final EventManager eventManager = EventManagerFactory.getEventManager();
     
     @FXML
@@ -113,6 +115,7 @@ public class EventManagementController {
         colPlace.setCellValueFactory(new PropertyValueFactory<>("place"));
         colPrice.setCellValueFactory(new PropertyValueFactory<>("ticketprice"));
         colDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
+        colClub.setCellValueFactory(new PropertyValueFactory<>("club"));
         
         colName.setCellFactory(TextFieldTableCell.forTableColumn());
         //Pass Date to String converter
@@ -121,6 +124,13 @@ public class EventManagementController {
         //Pass Float to String converter
         colPrice.setCellFactory(TextFieldTableCell.forTableColumn(new MyFloatStringConverter()));
         colDescription.setCellFactory(TextFieldTableCell.forTableColumn());
+        
+        List<Club> clubs = ClubManagerFactory.getClubManager().getAllClubs(new GenericType<List<Club>>(){});
+        List<String> clubNames = new ArrayList<>();
+        for(Club c : clubs) {
+            clubNames.add(c.getLogin());
+        }
+        colClub.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(clubNames)));
         
         colName.setOnEditCommit((CellEditEvent<Event, String> t) -> {
             if(validateLength(t.getNewValue())) {
@@ -188,6 +198,14 @@ public class EventManagementController {
                 tblEvents.refresh();
             }
         });
+        colClub.setOnEditCommit((CellEditEvent<Event, String> t) -> {
+            Event currEvent = t.getRowValue();
+            LOGGER.log(Level.INFO, t.getNewValue());
+            Club club = UserManagerFactory.getUserManager().getUserByLogin(Club.class, t.getNewValue());
+            currEvent.setClub(club);
+            eventManager.edit(currEvent);
+            tblEvents.refresh();
+        });
         
         //Get data and add it to the table
         refreshData();
@@ -236,7 +254,7 @@ public class EventManagementController {
     private void handleButtonAddEvent() {
         LOGGER.log(Level.INFO, "Adding event.");
         Event newEvent = new Event();
-        eventManager.create(newEvent);      
+        eventManager.create(newEvent);
         refreshData();
         tblEvents.refresh();
     }
