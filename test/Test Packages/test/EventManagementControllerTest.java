@@ -39,8 +39,7 @@ public class EventManagementControllerTest extends ApplicationTest {
     /** String of size MAX_TEXT_LENGTH + 1 for testing. */
     private static String longString = "";
     
-    private static final int colCount = 5;
-    enum colPos { colName, colDate, colPlace, colPrice, colDescription }
+    enum colPos { colName, colDate, colPlace, colPrice, colDescription, colClub }
     
     /**
      * Initializes testing variables.
@@ -124,6 +123,11 @@ public class EventManagementControllerTest extends ApplicationTest {
         col = lookup(".table-cell").nth(colPos.colDescription.ordinal()).query();
         doubleClickOn(col);
         write("Description");
+        push(KeyCode.ENTER);
+        col = lookup(".table-cell").nth(colPos.colClub.ordinal()).query();
+        doubleClickOn(col);
+        clickOn(col);
+        push(KeyCode.DOWN);
         push(KeyCode.ENTER);
     }
     
@@ -360,9 +364,5 @@ public class EventManagementControllerTest extends ApplicationTest {
         verifyThat("Are you sure you want to delete an Event?", NodeMatchers.isVisible());
         clickOn("OK");
         assertNotEquals(rowCount, lookup("#tblEvents").queryTableView().getItems().size());
-    }
-    
-    @Test
-    public void testO_MenuChangeWindow() {
     }
 }
