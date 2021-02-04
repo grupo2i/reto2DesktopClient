@@ -237,13 +237,16 @@ public class EventManagementController {
      */
     @FXML
     private void handleButtonRemoveEvent() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to delete an Event?", ButtonType.OK, ButtonType.CANCEL);
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            Event currEvent = (Event)tblEvents.getFocusModel().getFocusedItem();
-            LOGGER.log(Level.INFO, "Removing event with id: {0}", currEvent.getId());
-            eventManager.remove(currEvent.getId().toString());
-            refreshData();
+        ObservableList selectedItems = tblEvents.getSelectionModel().getSelectedItems();
+        if(!selectedItems.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to delete an Event?", ButtonType.OK, ButtonType.CANCEL);
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                Event currEvent = (Event)tblEvents.getFocusModel().getFocusedItem();
+                LOGGER.log(Level.INFO, "Removing event with id: {0}", currEvent.getId());
+                eventManager.remove(currEvent.getId().toString());
+                refreshData();
+            }
         }
     }
 
