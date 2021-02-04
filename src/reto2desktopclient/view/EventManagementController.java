@@ -31,6 +31,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
 import javafx.util.converter.DateStringConverter;
 import javafx.util.converter.FloatStringConverter;
+import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
 import reto2desktopclient.client.ClubManagerFactory;
 import reto2desktopclient.client.EventManager;
@@ -257,8 +258,15 @@ public class EventManagementController {
     private void handleButtonAddEvent() {
         LOGGER.log(Level.INFO, "Adding event.");
         Event newEvent = new Event();
-        eventManager.create(newEvent);
-        refreshData();
+        
+        try {
+            eventManager.create(newEvent);
+            refreshData();
+        } catch (ClientErrorException ex) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "An unexpected error ocurred.", ButtonType.OK);
+            alert.showAndWait();
+        }
+        
         tblEvents.refresh();
     }
 
