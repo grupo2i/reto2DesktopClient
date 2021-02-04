@@ -107,7 +107,7 @@ public class EventManagementController {
         
         //Make the table editable
         tblEvents.setEditable(true);
-        tblEvents.getSelectionModel().cellSelectionEnabledProperty().set(true);
+        //tblEvents.getSelectionModel().cellSelectionEnabledProperty().set(true);
         
         //Set cell editing properties
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
