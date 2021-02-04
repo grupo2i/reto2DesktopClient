@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import org.junit.BeforeClass;
@@ -92,6 +93,13 @@ public class EventManagementControllerTest extends ApplicationTest {
         assertNotEquals(rowCount, 0);
         Node row = lookup(".table-row-cell").nth(0).query();
         assertNotNull(row);
+    }
+    
+    @Test
+    public void testBB_No_Row_Remove() {
+        int rowCount = lookup("#tblEvents").queryTableView().getItems().size();
+        clickOn("#btnRemoveEvent");
+        assertEquals(rowCount, lookup("#tblEvents").queryTableView().getItems().size());
     }
     
     @Test
@@ -209,7 +217,7 @@ public class EventManagementControllerTest extends ApplicationTest {
         
         //Date
         col = lookup(".table-cell").nth(colPos.colDate.ordinal()).query();
-        doubleClickOn(col);
+        clickOn(col);
         write("a");
         push(KeyCode.BACK_SPACE);
         push(KeyCode.ENTER);
@@ -359,10 +367,14 @@ public class EventManagementControllerTest extends ApplicationTest {
         //Verify the alert too
         int rowCount = lookup("#tblEvents").queryTableView().getItems().size();
         Node row = lookup(".table-row-cell").nth(0).query();
+        TableView tblEvents = lookup("#tblEvents").queryTableView();
+        String preRemove = ((Event)tblEvents.getItems().get(0)).getName();
         clickOn(row);
         clickOn("#btnRemoveEvent");
         verifyThat("Are you sure you want to delete an Event?", NodeMatchers.isVisible());
         clickOn("OK");
         assertNotEquals(rowCount, lookup("#tblEvents").queryTableView().getItems().size());
+        String postRemove = ((Event)tblEvents.getItems().get(0)).getName();
+        assertNotEquals(preRemove, postRemove);
     }
 }
