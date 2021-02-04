@@ -263,7 +263,8 @@ public class EventManagementController {
             eventManager.create(newEvent);
             refreshData();
         } catch (ClientErrorException ex) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "An unexpected error ocurred.", ButtonType.OK);
+            LOGGER.log(Level.SEVERE, ex.getMessage());
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Could not create an event.", ButtonType.OK);
             alert.showAndWait();
         }
         
