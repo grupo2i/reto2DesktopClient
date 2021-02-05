@@ -2,11 +2,13 @@ package reto2desktopclient.security;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import javax.crypto.Cipher;
 import reto2desktopclient.exceptions.UnexpectedErrorException;
 
@@ -65,10 +67,13 @@ public class PublicCrypt {
      * @throws IOException If and I/O error occurs.
      */
     private static byte[] getPublicKey() throws IOException {
-        byte ret[];
-        File file = new File(PUBLIC_KEY_PATH);
-        ret = Files.readAllBytes(file.toPath());
-        return ret;
+        //LOGGER.log(Level.INFO, "Starting method getPublicKey on {0}", PublicCrypt.class.getName());
+        byte[] publicKeyBytes;
+        InputStream inputStream = PublicCrypt.class.getClassLoader()
+                .getResourceAsStream(PUBLIC_KEY_PATH);
+        publicKeyBytes = new byte[inputStream.available()];
+        inputStream.read(publicKeyBytes);
+        return publicKeyBytes;
     }
     
     /**

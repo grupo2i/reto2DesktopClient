@@ -33,6 +33,7 @@ import javafx.util.converter.DateStringConverter;
 import javafx.util.converter.FloatStringConverter;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
+import reto2desktopclient.client.ArtistManagerFactory;
 import reto2desktopclient.client.ClubManagerFactory;
 import reto2desktopclient.client.EventManager;
 import reto2desktopclient.client.EventManagerFactory;
@@ -243,10 +244,20 @@ public class EventManagementController {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to delete an Event?", ButtonType.OK, ButtonType.CANCEL);
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                Event currEvent = (Event)tblEvents.getFocusModel().getFocusedItem();
-                LOGGER.log(Level.INFO, "Removing event with id: {0}", currEvent.getId());
+                Event currEvent = (Event)tblEvents.getSelectionModel().getSelectedItems().get(0);
                 eventManager.remove(currEvent.getId().toString());
                 refreshData();
+                
+                if(currEvent.getArtists() != null) {
+                    for(Event e : eventData) {
+                        if(e.getId().intValue() == currEvent.getId().intValue()) {
+                            eventData.remove(e);
+                            break;
+                        }
+                    }
+                    tblEvents.setItems(eventData);
+                    tblEvents.refresh();
+                }
             }
         }
     }

@@ -68,7 +68,7 @@ public class EventManagementControllerTest extends ApplicationTest {
         controller.initStage(root);
     }
 
-    @Test
+    //@Test
     public void testA_InitialState() {
         //Label
         verifyThat("#lblError", isInvisible());
@@ -87,7 +87,7 @@ public class EventManagementControllerTest extends ApplicationTest {
         verifyThat("#colDescription", isVisible());
     }
     
-    @Test
+    //@Test
     public void testB_TableDataLoaded() {
         int rowCount = lookup("#tblEvents").queryTableView().getItems().size();
         assertNotEquals(rowCount, 0);
@@ -95,21 +95,21 @@ public class EventManagementControllerTest extends ApplicationTest {
         assertNotNull(row);
     }
     
-    @Test
+    //@Test
     public void testBB_No_Row_Remove() {
         int rowCount = lookup("#tblEvents").queryTableView().getItems().size();
         clickOn("#btnRemoveEvent");
         assertEquals(rowCount, lookup("#tblEvents").queryTableView().getItems().size());
     }
     
-    @Test
+    //@Test
     public void testC_AddEvent() {
         int rowCount = lookup("#tblEvents").queryTableView().getItems().size();
         clickOn("#btnAddEvent");
         assertNotEquals(rowCount, lookup("#tblEvents").queryTableView().getItems().size());
     }
     
-    @Test
+    //@Test
     public void testD_ModifyEvent() {
         int lastRow = lookup("#tblEvents").queryTableView().getItems().size() - 1;
         Node col = lookup(".table-cell").nth(colPos.colName.ordinal()).query();
@@ -139,7 +139,7 @@ public class EventManagementControllerTest extends ApplicationTest {
         push(KeyCode.ENTER);
     }
     
-    @Test
+    //@Test
     public void testE_ModifyEventName() {
         TableView tblEvents = lookup("#tblEvents").queryTableView();
         Node col = lookup(".table-cell").nth(colPos.colName.ordinal()).query();
@@ -151,7 +151,7 @@ public class EventManagementControllerTest extends ApplicationTest {
         assertNotEquals(preEdit, postEdit);
     }
     
-    @Test
+    //@Test
     public void testF_ModifyEventDate() {
         TableView tblEvents = lookup("#tblEvents").queryTableView();
         Node col = lookup(".table-cell").nth(colPos.colDate.ordinal()).query();
@@ -163,7 +163,7 @@ public class EventManagementControllerTest extends ApplicationTest {
         assertNotEquals(preEdit, postEdit);
     }
     
-    @Test
+    //@Test
     public void testG_ModifyEventPlace() {
         TableView tblEvents = lookup("#tblEvents").queryTableView();
         Node col = lookup(".table-cell").nth(colPos.colPlace.ordinal()).query();
@@ -175,7 +175,7 @@ public class EventManagementControllerTest extends ApplicationTest {
         assertNotEquals(preEdit, postEdit);
     }
     
-    @Test
+    //@Test
     public void testH_ModifyEventPrice() {
         TableView tblEvents = lookup("#tblEvents").queryTableView();
         Node col = lookup(".table-cell").nth(colPos.colPrice.ordinal()).query();
@@ -187,7 +187,7 @@ public class EventManagementControllerTest extends ApplicationTest {
         assertNotEquals(preEdit, postEdit);
     }
     
-    @Test
+    //@Test
     public void testI_ModifyEventDescription() {
         TableView tblEvents = lookup("#tblEvents").queryTableView();
         Node col = lookup(".table-cell").nth(colPos.colDescription.ordinal()).query();
@@ -199,7 +199,7 @@ public class EventManagementControllerTest extends ApplicationTest {
         assertNotEquals(preEdit, postEdit);
     }
     
-    @Test
+    //@Test
     public void testJ_EmptyStrings() {
         String emptyError = "* Field must not be empty.";
         //Name
@@ -268,7 +268,7 @@ public class EventManagementControllerTest extends ApplicationTest {
         verifyThat("#lblError", isInvisible());
     }
     
-    @Test
+    //@Test
     public void testK_MaxLengthStrings() {
         String maxLengthError = "* Must be less than 255 characters.";
         //Name
@@ -308,7 +308,7 @@ public class EventManagementControllerTest extends ApplicationTest {
         verifyThat("#lblError", isInvisible());
     }
     
-    @Test
+    //@Test
     public void testL_DateFormat() {
         //Date format is mm/dd/yy
         String dateFormatError = "* Date must have format: dd/mm/yy\nand be possible.";
@@ -335,7 +335,7 @@ public class EventManagementControllerTest extends ApplicationTest {
         verifyThat("#lblError", isInvisible());
     }
     
-    @Test
+    //@Test
     public void testM_PriceNonNegative() {
         //Prices cannot be negative
         String priceFormatError = "* Field should be a positive number.";
